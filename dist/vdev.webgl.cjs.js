@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const THREE = require("three");
-const OrbitControls = require("three/addons/controls/OrbitControls");
+const OrbitControls_js = require("three/addons/controls/OrbitControls.js");
 function _interopNamespaceDefault(e) {
   const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
   if (e) {
@@ -56,7 +56,7 @@ class App {
     this.interactive = interactive;
     this.interactiveProps = {};
     if (this.interactive) {
-      this.interactiveProps.orbitalControls = new OrbitControls.OrbitControls(this.camera, this.renderer.domElement);
+      this.interactiveProps.orbitalControls = new OrbitControls_js.OrbitControls(this.camera, this.renderer.domElement);
     }
     const renderLoop = () => {
       if (interactive) {

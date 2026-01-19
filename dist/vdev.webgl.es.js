@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { WebGLRenderer } from "three";
 export * from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 class RenderSystem extends WebGLRenderer {
   constructor() {
     super();

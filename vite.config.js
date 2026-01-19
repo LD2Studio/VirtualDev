@@ -16,7 +16,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'three',
-        'three/addons/controls/OrbitControls',  
+        'three/addons/controls/OrbitControls.js',
       ],
       output: {
         globals: {
