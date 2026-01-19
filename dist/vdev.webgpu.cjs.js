@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const OrbitControls = require("three/addons/controls/OrbitControls");
 const REVISION$1 = "182";
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -74363,7 +74364,8 @@ class App {
    */
   constructor(parameters = {}) {
     const {
-      name = "Untitled - VirtualDev"
+      name = "Untitled - VirtualDev",
+      interactive = false
     } = parameters;
     this.name = name;
     document.title = this.name;
@@ -74372,7 +74374,15 @@ class App {
     this.scene.background = new Color(6316128);
     this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
     this.camera.position.z = 5;
+    this.interactive = interactive;
+    this.interactiveProps = {};
+    if (this.interactive) {
+      this.interactiveProps.orbitalControls = new OrbitControls.OrbitControls(this.camera, this.renderer.domElement);
+    }
     const renderLoop = () => {
+      if (interactive) {
+        this.interactiveProps.orbitalControls.update();
+      }
       this.renderer.render(this.scene, this.camera);
     };
     this.renderer.setAnimationLoop(renderLoop);

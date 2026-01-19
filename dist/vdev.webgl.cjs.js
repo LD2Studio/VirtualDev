@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const THREE = require("three");
+const OrbitControls = require("three/addons/controls/OrbitControls");
 function _interopNamespaceDefault(e) {
   const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
   if (e) {
@@ -42,7 +43,8 @@ class App {
    */
   constructor(parameters = {}) {
     const {
-      name = "Untitled - VirtualDev"
+      name = "Untitled - VirtualDev",
+      interactive = false
     } = parameters;
     this.name = name;
     document.title = this.name;
@@ -51,7 +53,15 @@ class App {
     this.scene.background = new THREE__namespace.Color(6316128);
     this.camera = new THREE__namespace.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
     this.camera.position.z = 5;
+    this.interactive = interactive;
+    this.interactiveProps = {};
+    if (this.interactive) {
+      this.interactiveProps.orbitalControls = new OrbitControls.OrbitControls(this.camera, this.renderer.domElement);
+    }
     const renderLoop = () => {
+      if (interactive) {
+        this.interactiveProps.orbitalControls.update();
+      }
       this.renderer.render(this.scene, this.camera);
     };
     this.renderer.setAnimationLoop(renderLoop);

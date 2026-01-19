@@ -6,12 +6,17 @@ export type AppOptions = {
      * - A name for the application
      */
     name?: string;
+    /**
+     * - Enable interactive mode
+     */
+    interactive?: boolean;
 };
 /**
  * Application options
  *
  * @typedef {Object} AppOptions
  * @property {string} [name=''] - A name for the application
+ * @property {boolean} [interactive=false] - Enable interactive mode
  */
 /**
  * Create a new game application
@@ -42,6 +47,8 @@ export class App {
      * @type {THREE.PerspectiveCamera}
      */
     camera: THREE.PerspectiveCamera;
+    interactive: boolean;
+    interactiveProps: {};
 }
 export const REVISION: "0.0.1";
 //# sourceMappingURL=vdev.webgl.d.ts.map

@@ -14,7 +14,10 @@ export default defineConfig({
       fileName: (format, entryName) => `${entryName}.${format}.js` // Nom du fichier de sortie
     },
     rollupOptions: {
-      external: ['three'],
+      external: [
+        'three',
+        'three/addons/controls/OrbitControls',  
+      ],
       output: {
         globals: {
           three: 'THREE'
