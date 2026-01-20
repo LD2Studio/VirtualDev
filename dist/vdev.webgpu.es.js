@@ -75215,13 +75215,21 @@ class App {
     if (this.interactive) {
       this.interactiveProps.orbitalControls = new OrbitControls(this.camera, this.renderer.domElement);
     }
+    this._clock = new Clock();
+    this._lastTime = this._clock.getElapsedTime();
     const renderLoop = () => {
+      const time2 = this._clock.getElapsedTime();
+      const deltaTime2 = time2 - this._lastTime;
+      this._lastTime = time2;
+      this.onRender(time2, deltaTime2);
       if (interactive) {
         this.interactiveProps.orbitalControls.update();
       }
       this.renderer.render(this.scene, this.camera);
     };
     this.renderer.setAnimationLoop(renderLoop);
+    this.onRender = (time2, deltaTime2) => {
+    };
     window.addEventListener("resize", () => {
       this.camera.aspect = this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight;
       this.camera.updateProjectionMatrix();

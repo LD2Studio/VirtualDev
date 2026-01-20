@@ -64,7 +64,16 @@ class App {
             this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
         }
 
+        this._clock = new THREE.Clock();
+        this._lastTime = this._clock.getElapsedTime();
+
         const renderLoop = () => {
+            const time = this._clock.getElapsedTime();
+            const deltaTime = time - this._lastTime;
+            this._lastTime = time;
+
+            this.onRender(time, deltaTime);
+
             if (interactive) {
                 this.interactiveProps.orbitalControls.update();
             }
@@ -72,6 +81,10 @@ class App {
         }
 
         this.renderer.setAnimationLoop( renderLoop );
+
+        this.onRender = (time, deltaTime) => {
+            // console.log('onRender');
+        };
 
         window.addEventListener( 'resize', () => {
             // Update camera

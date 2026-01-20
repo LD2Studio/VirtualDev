@@ -42,6 +42,9 @@ export class App {
     camera: THREE.PerspectiveCamera;
     interactive: boolean;
     interactiveProps: {};
+    _clock: any;
+    _lastTime: any;
+    onRender: (time: any, deltaTime: any) => void;
 }
 /**
  * Application options

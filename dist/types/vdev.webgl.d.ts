@@ -49,6 +49,9 @@ export class App {
     camera: THREE.PerspectiveCamera;
     interactive: boolean;
     interactiveProps: {};
+    _clock: any;
+    _lastTime: any;
+    onRender: (time: any, deltaTime: any) => void;
 }
 export const REVISION: "0.0.1";
 //# sourceMappingURL=vdev.webgl.d.ts.map
