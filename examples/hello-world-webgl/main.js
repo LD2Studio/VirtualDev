@@ -1,7 +1,8 @@
 import * as VDEV from 'virtualdev'
 
 const app = new VDEV.App({
-    name: 'Hello World WebGL'
+    name: 'Hello World WebGL',
+    interactive: true,
 });
 
 const cube = new VDEV.Mesh(

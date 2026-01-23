@@ -1,7 +1,8 @@
 import * as VDEV from 'virtualdev/webgpu';
 
 const app = new VDEV.App({
-    name: "Hello World WebGPU"
+    name: "Hello World WebGPU",
+    interactive: true,
 });
 
 const cube = new VDEV.Mesh(

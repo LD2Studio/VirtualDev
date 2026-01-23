@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export * from 'three';
 import { RenderSystem } from './renderers/rendersystem.webgl';
+import { Outliner } from './ui/outliner';
 
 // TODO
 // 
@@ -64,6 +65,7 @@ class App {
         if (this.interactive) {
             this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
             this.interactiveProps.orbitalControls.enableDamping = true;
+            this.interactiveProps.outliner = new Outliner( this.scene, this.camera );
         }
 
         this._clock = new THREE.Clock();

@@ -17,6 +17,7 @@ export default defineConfig({
       external: [
         'three',
         'three/addons/controls/OrbitControls.js',
+        'tweakpane',
       ],
       output: {
         globals: {
