@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { XRButton } from 'three/addons/webxr/XRButton.js';
 
-import { RenderSystem } from './renderers/rendersystem.webgl';
 import { Outliner } from './ui/outliner';
 
 const REVISION = '0.0.1';
@@ -19,35 +18,58 @@ const REVISION = '0.0.1';
  */
 
 /**
- * Create a new game application
- * 
- * The rendering is done using WebGL
- * @type {Object}
+ * Class to create a new application
  */
 class App {
     /**
-     * Construct a new game application
+     * Construct a new application
      * 
      * @param {AppOptions} [parameters] - The configuration parameter
      */
-    constructor( parameters = {} ) {
+    constructor(renderEngine, parameters = {}) {
+        // console.log( renderEngine );
+        this.MODULE = renderEngine;
+        this.webgl = this.MODULE.WebGLRenderer !== undefined;
 
         const {
-            name = 'Untitled - VirtualDev',
+            name = 'Untitled',
             interactive = false,
             vr = false,
             ar = false,
         } = parameters;
 
-        this.name = name;
+        this.name = document.title === '' ? name : document.title;
+        this.name = `${this.name} ${interactive ? '(Interactive)' : ''}`;
         document.title = this.name;
 
         /**
          * The rendering system
-         * @type {THREE.WebGLRenderer}
+         * @type {THREE.WebGLRenderer|THREE.WebGPURenderer}
          */
-        this.renderer = new RenderSystem();
+        this.renderer = null;
+        if (this.webgl) {
+            this.renderer = new this.MODULE.WebGLRenderer();
+        }
+        else {
+            this.renderer = new this.MODULE.WebGPURenderer();
+        }
+        console.log(`VirtualDev v${REVISION} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
 
+        if (this.renderer) {
+            this.renderer.setSize(window.innerWidth, window.innerHeight, false);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            this.renderer.domElement.style.width = '100%';
+            this.renderer.domElement.style.height = '100%';
+            document.body.appendChild( this.renderer.domElement );
+            const canvas = this.renderer.domElement;
+
+            if ( canvas.parentNode.localName === 'body') {
+                canvas.parentNode.style.margin = 0;
+                canvas.parentNode.style.height = '100vh';
+            }
+        }
+ 
         /**
          * The scene
          * @type {THREE.Scene}
@@ -113,4 +135,14 @@ class App {
     }
 }
 
-export { App, REVISION };
+/**
+ * Create a new application
+ * 
+ * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
+ * @param {AppOptions} [parameters] - The configuration parameter
+ */
+const createApp = (renderEngine, parameters) => {
+    return new App(renderEngine, parameters);
+}
+
+export { createApp };

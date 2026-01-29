@@ -1,12 +1,13 @@
-import * as VDEV from 'virtualdev/webgpu';
+import * as THREE from 'three/webgpu';
+import { createApp } from 'virtualdev';
 
-const app = new VDEV.App({
-    name: "Hello World WebGPU",
+const app = createApp( THREE, {
+    name: "VirtualDev - Hello WebGPU",
     interactive: true,
 });
 
-const cube = new VDEV.Mesh(
-    new VDEV.BoxGeometry(1, 1, 1),
-    new VDEV.MeshBasicMaterial()
+const cube = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshMatcapMaterial()
 );
 app.scene.add(cube);

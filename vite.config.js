@@ -3,12 +3,11 @@ import { resolve } from 'path';
 
 export default defineConfig({
   build: {
-    // sourcemap: true,
+    sourcemap: true,
     minify: false,
     lib: {
       entry: [
-        resolve(__dirname, 'src/vdev.webgl.js'),
-        resolve(__dirname, 'src/vdev.webgpu.js'),
+        resolve(__dirname, 'src/virtualdev.js')
       ], // Point d'entrée de ton module
       name: 'vdev', // Nom global si tu veux supporter l'usage en tant que variable globale
       fileName: (format, entryName) => `${entryName}.${format}.js` // Nom du fichier de sortie
@@ -16,12 +15,12 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'three',
-        'three/addons/controls/OrbitControls.js',
         'tweakpane',
       ],
       output: {
         globals: {
-          three: 'THREE'
+          three: 'THREE',
+          tweakpane: 'tweakpane',
         },
       }
     }

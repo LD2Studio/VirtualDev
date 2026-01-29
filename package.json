@@ -4,19 +4,14 @@
   "description": "Framework for developing virtual worlds for the web",
   "license": "MIT",
   "author": "Laurent Dethoor aka LD2Studio",
-  "main": "./dist/vdev.webgl.cjs.js",
-  "module": "./dist/vdev.webgl.es.js",
-  "types": "./dist/types/vdev.webgl.d.ts",
+  "main": "./dist/virtualdev.cjs.js",
+  "module": "./dist/virtualdev.es.js",
+  "types": "./dist/types/virtualdev.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/vdev.webgl.d.ts",
-      "import": "./dist/vdev.webgl.es.js",
-      "require": "./dist/vdev.webgl.cjs.js"
-    },
-    "./webgpu": {
-      "types": "./dist/types/vdev.webgpu.d.ts",
-      "import": "./dist/vdev.webgpu.es.js",
-      "require": "./dist/vdev.webgpu.cjs.js"
+      "types": "./dist/types/virtualdev.d.ts",
+      "import": "./dist/virtualdev.es.js",
+      "require": "./dist/virtualdev.cjs.js"
     }
   },
   "files": [
