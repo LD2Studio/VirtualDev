@@ -1,11 +1,11 @@
 import {
     WebGPURenderer
-} from 'three/webgpu'
+} from 'three/webgpu';
 
 /**
  * This renderer uses WebGPU to dispay scenes.
  * 
- * @augments WebGLRenderer
+ * @augments WebGPURenderer
  */
 class RenderSystem extends WebGPURenderer{
     constructor() {

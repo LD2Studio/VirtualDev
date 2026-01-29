@@ -1,12 +1,10 @@
 import * as THREE from 'three/webgpu';
 import { OrbitControls } from 'three/addons/controls/OrbitControls';
 
-export * from 'three/webgpu';
 import { RenderSystem } from './renderers/rendersystem.webgpu';
 import { Outliner } from './ui/outliner';
 
-// TODO
-//
+const REVISION = '0.0.1';
 
 /**
  * Application options
@@ -15,8 +13,6 @@ import { Outliner } from './ui/outliner';
  * @property {string} [name=''] - A name for the application
  * @property {boolean} [interactive=false] - Enable interactive mode
  */
-
-const REVISION = '0.0.1';
 
 /**
  * Create a new game application
@@ -33,7 +29,7 @@ class App {
     constructor( parameters = {} ) {
         const {
             name = 'Untitled - VirtualDev',
-             interactive = false,
+            interactive = false,
         } = parameters;
 
         this.name = name;

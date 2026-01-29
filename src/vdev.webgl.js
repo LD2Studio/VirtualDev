@@ -1,12 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+import { XRButton } from 'three/addons/webxr/XRButton.js';
 
-export * from 'three';
 import { RenderSystem } from './renderers/rendersystem.webgl';
 import { Outliner } from './ui/outliner';
-
-// TODO
-// 
 
 const REVISION = '0.0.1';
 
@@ -16,6 +14,8 @@ const REVISION = '0.0.1';
  * @typedef {Object} AppOptions
  * @property {string} [name=''] - A name for the application
  * @property {boolean} [interactive=false] - Enable interactive mode
+ * @property {boolean} [vr=false] - Enable VR mode
+ * @property {boolean} [ar=false] - Enable AR mode
  */
 
 /**
@@ -35,6 +35,8 @@ class App {
         const {
             name = 'Untitled - VirtualDev',
             interactive = false,
+            vr = false,
+            ar = false,
         } = parameters;
 
         this.name = name;
@@ -66,6 +68,17 @@ class App {
             this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
             this.interactiveProps.orbitalControls.enableDamping = true;
             this.interactiveProps.outliner = new Outliner( this.scene, this.camera );
+        }
+
+        // VR
+        if (vr) {
+            document.body.appendChild(VRButton.createButton(this.renderer));
+            this.renderer.xr.enabled = true;
+        }
+        // AR
+        if (ar) {
+            document.body.appendChild(XRButton.createButton(this.renderer));
+            this.renderer.xr.enabled = true;
         }
 
         this._clock = new THREE.Clock();
