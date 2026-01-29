@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "target": "ES6",
+    "lib": ["ES2017", "DOM"],
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
