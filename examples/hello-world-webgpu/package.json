@@ -9,10 +9,7 @@
     "preview": "vite preview"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "virtualdev": "file:../../"
-  }
+  "author": "Laurent Dethoor",
+  "license": "MIT",
+  "type": "module"
 }

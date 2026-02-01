@@ -3,9 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { XRButton } from 'three/addons/webxr/XRButton.js';
 
+import { Input } from './core/inputs';
 import { Outliner } from './ui/outliner';
 
-const REVISION = '0.0.1';
+import { version } from '../package.json';
 
 /**
  * Application options
@@ -53,7 +54,7 @@ class App {
         else {
             this.renderer = new this.MODULE.WebGPURenderer();
         }
-        console.log(`VirtualDev v${REVISION} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
+        console.log(`VirtualDev v${version} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
 
         if (this.renderer) {
             this.renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -83,6 +84,25 @@ class App {
          */
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.camera.position.z = 5;
+
+        /**
+         * The input manager
+         * @example
+         * this.inputs.actions = [
+         *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+         *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
+         *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+         *     { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+         *     { name: 'run', keys: ['ShiftLeft', 'ShiftRight']}
+         * ]
+         *
+         * this.onRender = (time, deltaTime) => {
+         *      if (app.inputs.isPressed('forward')) {
+         *          // do something
+         *      }
+         * }
+         */
+        this.inputs = new Input();
 
         this.interactive = interactive;
         this.interactiveProps = {};
