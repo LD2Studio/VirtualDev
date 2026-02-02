@@ -16,6 +16,7 @@ import { version } from '../package.json';
  * @property {boolean} [interactive=false] - Enable interactive mode
  * @property {boolean} [vr=false] - Enable VR mode
  * @property {boolean} [ar=false] - Enable AR mode
+ * @property {boolean} [monitor=false] - Enable monitor mode
  */
 
 /**
@@ -37,6 +38,7 @@ class App {
             interactive = false,
             vr = false,
             ar = false,
+            monitor = false,
         } = parameters;
 
         this.name = document.title === '' ? name : document.title;
@@ -122,6 +124,18 @@ class App {
             document.body.appendChild(XRButton.createButton(this.renderer));
             this.renderer.xr.enabled = true;
         }
+        // Monitor
+        this.stats = null;
+        if (monitor) {
+            const Stats = import('./extras/stats-gl/main.js')
+                .then((Stats) => {
+                    this.stats = new Stats.default( {
+                        trackGPU: true
+                    });
+                    document.body.appendChild(this.stats.dom);
+                    this.stats.init( this.renderer );
+                })
+        }
 
         this._clock = new THREE.Clock();
         this._lastTime = this._clock.getElapsedTime();
@@ -135,6 +149,12 @@ class App {
 
             if (interactive) {
                 this.interactiveProps.orbitalControls.update();
+            }
+            if (this.stats) {
+                this.stats.update();
+                if (!this.webgl) {
+                    this.renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+                }
             }
             this.renderer.render( this.scene, this.camera );
         }

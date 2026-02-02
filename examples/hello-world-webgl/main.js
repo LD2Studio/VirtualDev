@@ -4,6 +4,7 @@ import { createApp } from 'virtualdev';
 const app = createApp( THREE, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
+    monitor: true
 });
 
 const cube = new THREE.Mesh(
