@@ -156,13 +156,21 @@ class App {
                     this.renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
                 }
             }
+            this.onBeforeRender(time, deltaTime);
             this.renderer.render( this.scene, this.camera );
+            this.onAfterRender(time, deltaTime);
         }
 
         this.renderer.setAnimationLoop( renderLoop );
 
         this.onRender = (time, deltaTime) => {
             // console.log('onRender');
+        };
+        this.onBeforeRender = (time, deltaTime) => {
+            // console.log('onBeforeRender');
+        };
+        this.onAfterRender = (time, deltaTime) => {
+            // console.log('onAfterRender');
         };
 
         window.addEventListener( 'resize', () => {
