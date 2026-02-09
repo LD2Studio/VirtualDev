@@ -1,6 +1,6 @@
 {
   "name": "virtualdev",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Framework for developing virtual worlds for the web",
   "license": "MIT",
   "author": "Laurent Dethoor aka LD2Studio",
