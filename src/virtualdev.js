@@ -20,9 +20,9 @@ import { version } from '../package.json';
  */
 
 /**
- * Class to create a new application
+ * Class to create a 3D virtual world application
  */
-class App {
+export default class App {
     /**
      * Construct a new application
      * 
@@ -111,7 +111,7 @@ class App {
         if (this.interactive) {
             this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
             this.interactiveProps.orbitalControls.enableDamping = true;
-            this.interactiveProps.outliner = new Outliner(
+            this.outliner = new Outliner(
                 this.scene, this.camera,
                 this.interactiveProps.orbitalControls
              );
@@ -184,16 +184,25 @@ class App {
             this.renderer.setSize( this.renderer.domElement.clientWidth, this.renderer.domElement.clientHeight, false);
         });
     }
-}
 
-/**
- * Create a new application
- * 
- * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
- * @param {AppOptions} [parameters] - The configuration parameter
- */
-const createApp = (renderEngine, parameters) => {
-    return new App(renderEngine, parameters);
-}
+    static #instance = null;
 
-export { createApp };
+    /**
+     * Initialize the application
+     * 
+     * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {AppOptions} [parameters] - The configuration parameter
+     */
+    static init(renderEngine, parameters) {
+        if (this.#instance === null) {
+            this.#instance = new App(renderEngine, parameters);
+        }
+        return this.#instance;
+    }
+    static getInstance() {
+        if (this.#instance === null) {
+            return null;
+        }
+        return this.#instance;
+    }
+}

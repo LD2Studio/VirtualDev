@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
-import { createApp } from 'virtualdev';
+import VDEV from 'virtualdev';
 
-const app = createApp( THREE, {
+const app = VDEV.init(THREE, {
     name: "VirtualDev - Hello WebGPU",
     interactive: true,
     monitor: true

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { createApp } from 'virtualdev';
+import VDEV from 'virtualdev';
 
-const app = createApp( THREE, {
+const app = VDEV.init(THREE, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
     monitor: true
