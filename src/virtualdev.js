@@ -111,7 +111,10 @@ class App {
         if (this.interactive) {
             this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
             this.interactiveProps.orbitalControls.enableDamping = true;
-            this.interactiveProps.outliner = new Outliner( this.scene, this.camera );
+            this.interactiveProps.outliner = new Outliner(
+                this.scene, this.camera,
+                this.interactiveProps.orbitalControls
+             );
         }
 
         // VR
