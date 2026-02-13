@@ -4,7 +4,8 @@ import VDEV from 'virtualdev';
 const app = VDEV.init(THREE, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
-    monitor: true
+    monitor: true,
+    antialias: true
 });
 
 const cube = new THREE.Mesh(

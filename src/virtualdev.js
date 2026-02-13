@@ -17,6 +17,7 @@ import { version } from '../package.json';
  * @property {boolean} [vr=false] - Enable VR mode
  * @property {boolean} [ar=false] - Enable AR mode
  * @property {boolean} [monitor=false] - Enable monitor mode
+ * @property {boolean} [antialias=false] - Enable antialiasing
  */
 
 /**
@@ -39,6 +40,7 @@ export default class App {
             vr = false,
             ar = false,
             monitor = false,
+            antialias = false
         } = parameters;
 
         this.name = document.title === '' ? name : document.title;
@@ -51,10 +53,14 @@ export default class App {
          */
         this.renderer = null;
         if (this.webgl) {
-            this.renderer = new this.MODULE.WebGLRenderer();
+            this.renderer = new this.MODULE.WebGLRenderer({
+                antialias
+            });
         }
         else {
-            this.renderer = new this.MODULE.WebGPURenderer();
+            this.renderer = new this.MODULE.WebGPURenderer({
+                antialias
+            });
         }
         console.log(`VirtualDev v${version} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
 
