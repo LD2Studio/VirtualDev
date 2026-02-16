@@ -5,5 +5,5 @@ A framework for developing virtuals worlds for the Web.
 ## Installation
 
 ```bash
-npm install virtualdev
+npm i git+https://github.com/LD2Studio/VirtualDev.git
 ```
