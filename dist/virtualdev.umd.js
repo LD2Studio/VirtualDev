@@ -1355,7 +1355,6 @@
         }
       }
       this.scene = new THREE__namespace.Scene();
-      this.scene.background = new THREE__namespace.Color(6316128);
       this.camera = new THREE__namespace.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
       this.camera.position.z = 5;
       this.inputs = new Input();

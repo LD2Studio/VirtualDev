@@ -1337,7 +1337,6 @@ class App {
       }
     }
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(6316128);
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
     this.camera.position.z = 5;
     this.inputs = new Input();

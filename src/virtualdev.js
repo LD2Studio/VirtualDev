@@ -86,7 +86,7 @@ export class App {
          * @type {THREE.Scene}
          */
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color( 0x606060 );
+        // this.scene.background = new THREE.Color( 0x606060 );
 
         /**
          * The camera
