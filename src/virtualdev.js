@@ -5,8 +5,11 @@ import { XRButton } from 'three/addons/webxr/XRButton.js';
 
 import { Input } from './core/inputs';
 import { Outliner } from './ui/outliner';
+import { EntityManager, Entity } from './core/entity';
 
 import { version } from '../package.json';
+
+export { Entity };
 
 /**
  * Application options
@@ -23,7 +26,7 @@ import { version } from '../package.json';
 /**
  * Class to create a 3D virtual world application
  */
-export default class App {
+export class App {
     /**
      * Construct a new application
      * 
@@ -145,6 +148,11 @@ export default class App {
                     this.stats.init( this.renderer );
                 })
         }
+
+        // Entities Manager
+        // Instanciate Entity Manager
+        EntityManager.init( this.scene );
+        this.sceneTree = EntityManager.getInstance();
 
         this._clock = new THREE.Clock();
         this._lastTime = this._clock.getElapsedTime();

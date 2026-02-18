@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Ray, Plane, MathUtils, Vector3, Controls, MOUSE, TOUCH, Quaternion, Spherical, Vector2 } from "three";
+import { Controls, Vector3, MOUSE, TOUCH, Quaternion, Spherical, Vector2, Ray, Plane, MathUtils } from "three";
 import { Pane } from "tweakpane";
 const _changeEvent = { type: "change" };
 const _startEvent = { type: "start" };
@@ -1232,6 +1232,59 @@ class Outliner extends Pane {
     });
   }
 }
+class EntityManager {
+  constructor(scene, physics) {
+    this.scene = scene;
+    this._phyObjects = [];
+  }
+  static #instance = null;
+  static init(scene, physics) {
+    if (this.#instance === null) {
+      this.#instance = new EntityManager(scene, physics);
+    }
+  }
+  static getInstance() {
+    if (this.#instance === null) {
+      return null;
+    }
+    return this.#instance;
+  }
+  add(entity) {
+    entity.children.forEach((c) => {
+      if (c.isObject3D) {
+        this.scene.add(c);
+      } else if (c.rigidBody !== void 0) {
+        this._phyObjects.push(c);
+      }
+    });
+  }
+  remove(entity) {
+  }
+  update() {
+    this._phyObjects.forEach((obj) => {
+      if (obj.rigidBody !== void 0) {
+        if (obj.rigidBody.isDynamic()) {
+          obj.mesh.position.copy(obj.rigidBody.translation());
+          obj.mesh.quaternion.copy(obj.rigidBody.rotation());
+        }
+      }
+    });
+  }
+}
+class Entity {
+  constructor(name) {
+    this.name = name;
+    this.children = [];
+  }
+  init() {
+  }
+  add(child) {
+    this.children.push(child);
+  }
+  remove(child) {
+    this.children = this.children.filter((c) => c !== child);
+  }
+}
 const version = "0.0.4";
 class App {
   /**
@@ -1310,6 +1363,8 @@ class App {
         this.stats.init(this.renderer);
       });
     }
+    EntityManager.init(this.scene);
+    this.sceneTree = EntityManager.getInstance();
     this._clock = new THREE.Clock();
     this._lastTime = this._clock.getElapsedTime();
     const renderLoop = () => {
@@ -1364,6 +1419,7 @@ class App {
   }
 }
 export {
-  App as default
+  App,
+  Entity
 };
 //# sourceMappingURL=virtualdev.es.js.map

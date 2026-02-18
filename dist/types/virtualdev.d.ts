@@ -1,3 +1,4 @@
+export { Entity };
 /**
  * Application options
  *
@@ -12,7 +13,7 @@
 /**
  * Class to create a 3D virtual world application
  */
-export default class App {
+export class App {
     static "__#private@#instance": any;
     /**
      * Initialize the application
@@ -223,6 +224,7 @@ export default class App {
         patchThreeWebGPU(renderer: any): void;
         patchThreeRenderer(renderer: any): void;
     };
+    sceneTree: any;
     _clock: THREE.Clock;
     _lastTime: number;
     onRender: (time: any, deltaTime: any) => void;
@@ -258,6 +260,7 @@ export type AppOptions = {
      */
     antialias?: boolean;
 };
+import { Entity } from './core/entity';
 import * as THREE from 'three';
 import { Outliner } from './ui/outliner';
 //# sourceMappingURL=virtualdev.d.ts.map

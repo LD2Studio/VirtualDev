@@ -1,6 +1,6 @@
 (function(global, factory) {
-  typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("three"), require("tweakpane")) : typeof define === "function" && define.amd ? define(["three", "tweakpane"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.vdev = factory(global.THREE, global.tweakpane));
-})(this, (function(THREE, tweakpane) {
+  typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("three"), require("tweakpane")) : typeof define === "function" && define.amd ? define(["exports", "three", "tweakpane"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global.vdev = {}, global.THREE, global.tweakpane));
+})(this, (function(exports2, THREE, tweakpane) {
   "use strict";
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
@@ -1250,6 +1250,59 @@
       });
     }
   }
+  class EntityManager {
+    constructor(scene, physics) {
+      this.scene = scene;
+      this._phyObjects = [];
+    }
+    static #instance = null;
+    static init(scene, physics) {
+      if (this.#instance === null) {
+        this.#instance = new EntityManager(scene, physics);
+      }
+    }
+    static getInstance() {
+      if (this.#instance === null) {
+        return null;
+      }
+      return this.#instance;
+    }
+    add(entity) {
+      entity.children.forEach((c) => {
+        if (c.isObject3D) {
+          this.scene.add(c);
+        } else if (c.rigidBody !== void 0) {
+          this._phyObjects.push(c);
+        }
+      });
+    }
+    remove(entity) {
+    }
+    update() {
+      this._phyObjects.forEach((obj) => {
+        if (obj.rigidBody !== void 0) {
+          if (obj.rigidBody.isDynamic()) {
+            obj.mesh.position.copy(obj.rigidBody.translation());
+            obj.mesh.quaternion.copy(obj.rigidBody.rotation());
+          }
+        }
+      });
+    }
+  }
+  class Entity {
+    constructor(name) {
+      this.name = name;
+      this.children = [];
+    }
+    init() {
+    }
+    add(child) {
+      this.children.push(child);
+    }
+    remove(child) {
+      this.children = this.children.filter((c) => c !== child);
+    }
+  }
   const version = "0.0.4";
   class App {
     /**
@@ -1328,6 +1381,8 @@
           this.stats.init(this.renderer);
         });
       }
+      EntityManager.init(this.scene);
+      this.sceneTree = EntityManager.getInstance();
       this._clock = new THREE__namespace.Clock();
       this._lastTime = this._clock.getElapsedTime();
       const renderLoop = () => {
@@ -3015,6 +3070,8 @@
     TextureCaptureWebGPU,
     default: Stats
   }, Symbol.toStringTag, { value: "Module" }));
-  return App;
+  exports2.App = App;
+  exports2.Entity = Entity;
+  Object.defineProperty(exports2, Symbol.toStringTag, { value: "Module" });
 }));
 //# sourceMappingURL=virtualdev.umd.js.map
