@@ -1309,16 +1309,15 @@ class App {
       vr = false,
       ar = false,
       monitor = false,
-      antialias = false
+      antialias = false,
+      renderOptions = {}
     } = parameters;
     this.name = document.title === "" ? name : document.title;
     this.name = `${this.name} ${interactive ? "(Interactive)" : ""}`;
     document.title = this.name;
     this.renderer = null;
     if (this.webgl) {
-      this.renderer = new this.MODULE.WebGLRenderer({
-        antialias
-      });
+      this.renderer = new this.MODULE.WebGLRenderer(renderOptions);
     } else {
       this.renderer = new this.MODULE.WebGPURenderer({
         antialias
