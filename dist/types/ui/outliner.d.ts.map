@@ -1,1 +1,1 @@
-{"version":3,"file":"outliner.d.ts","sourceRoot":"","sources":["../../../src/ui/outliner.js"],"names":[],"mappings":"AAEA;IACI,sDA0CC;IAtCG,WAAkB;IAClB,YAAoB;IAEpB,kBAEE;CAkCT"}
+{"version":3,"file":"outliner.d.ts","sourceRoot":"","sources":["../../../src/ui/outliner.js"],"names":[],"mappings":"AAGA;IACI,qEAkDC;IA9CG,WAAkB;IAClB,YAAoB;IAEpB,kBAEE;IAsCF,eAEE;CAET"}

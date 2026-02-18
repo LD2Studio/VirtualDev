@@ -227,6 +227,7 @@ export class App {
     sceneTree: any;
     _clock: THREE.Clock;
     _lastTime: number;
+    _firstRender: boolean;
     onRender: (time: any, deltaTime: any) => void;
     onBeforeRender: (time: any, deltaTime: any) => void;
     onAfterRender: (time: any, deltaTime: any) => void;

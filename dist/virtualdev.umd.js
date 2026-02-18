@@ -1207,7 +1207,7 @@
     }
   }
   class Outliner extends tweakpane.Pane {
-    constructor(scene, camera, camControl) {
+    constructor(scene, camera, camControl, renderer) {
       super({
         title: "Outliner",
         expanded: false
@@ -1218,35 +1218,43 @@
         title: "📸 Camera",
         expanded: false
       });
-      const positionFolder = this._cameraProps.addFolder({
-        title: "Position"
-      });
-      positionFolder.addBinding(this.camera.position, "x", {
-        readonly: true,
-        label: "X"
-      });
-      positionFolder.addBinding(this.camera.position, "y", {
-        readonly: true,
-        label: "Y"
-      });
-      positionFolder.addBinding(this.camera.position, "z", {
-        readonly: true,
-        label: "Z"
-      });
-      const targetFolder = this._cameraProps.addFolder({
-        title: "Target"
-      });
-      targetFolder.addBinding(camControl.target, "x", {
-        readonly: true,
-        label: "X"
-      });
-      targetFolder.addBinding(camControl.target, "y", {
-        readonly: true,
-        label: "Y"
-      });
-      targetFolder.addBinding(camControl.target, "z", {
-        readonly: true,
-        label: "Z"
+      {
+        const positionFolder = this._cameraProps.addFolder({
+          title: "Position"
+        });
+        positionFolder.addBinding(this.camera.position, "x", {
+          readonly: true,
+          label: "X"
+        });
+        positionFolder.addBinding(this.camera.position, "y", {
+          readonly: true,
+          label: "Y"
+        });
+        positionFolder.addBinding(this.camera.position, "z", {
+          readonly: true,
+          label: "Z"
+        });
+      }
+      {
+        const targetFolder = this._cameraProps.addFolder({
+          title: "Target"
+        });
+        targetFolder.addBinding(camControl.target, "x", {
+          readonly: true,
+          label: "X"
+        });
+        targetFolder.addBinding(camControl.target, "y", {
+          readonly: true,
+          label: "Y"
+        });
+        targetFolder.addBinding(camControl.target, "z", {
+          readonly: true,
+          label: "Z"
+        });
+      }
+      this._resProps = this.addFolder({
+        title: `📈 GPU (Three.js r${THREE.REVISION})`,
+        expanded: false
       });
     }
   }
@@ -1360,7 +1368,8 @@
         this.outliner = new Outliner(
           this.scene,
           this.camera,
-          this.interactiveProps.orbitalControls
+          this.interactiveProps.orbitalControls,
+          this.renderer
         );
       }
       if (vr) {
@@ -1385,10 +1394,18 @@
       this.sceneTree = EntityManager.getInstance();
       this._clock = new THREE__namespace.Clock();
       this._lastTime = this._clock.getElapsedTime();
+      this._firstRender = true;
       const renderLoop = () => {
         const time = this._clock.getElapsedTime();
         const deltaTime = time - this._lastTime;
         this._lastTime = time;
+        if (this._firstRender) {
+          if (this.renderer.isWebGPURenderer) {
+            const backend = this.renderer.backend.isWebGPUBackend ? "WebGPU" : "WebGL2";
+            console.log(backend);
+          }
+          this._firstRender = false;
+        }
         this.onRender(time, deltaTime);
         if (interactive) {
           this.interactiveProps.orbitalControls.update();

@@ -122,7 +122,8 @@ export class App {
             this.interactiveProps.orbitalControls.enableDamping = true;
             this.outliner = new Outliner(
                 this.scene, this.camera,
-                this.interactiveProps.orbitalControls
+                this.interactiveProps.orbitalControls,
+                this.renderer
              );
         }
 
@@ -156,11 +157,20 @@ export class App {
 
         this._clock = new THREE.Clock();
         this._lastTime = this._clock.getElapsedTime();
+        this._firstRender = true;
 
         const renderLoop = () => {
             const time = this._clock.getElapsedTime();
             const deltaTime = time - this._lastTime;
             this._lastTime = time;
+
+            if (this._firstRender) {
+                if (this.renderer.isWebGPURenderer) {
+                    const backend = this.renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL2';
+                    console.log(backend);
+                }
+                this._firstRender = false;
+            }
 
             this.onRender(time, deltaTime);
 

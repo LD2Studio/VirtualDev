@@ -1,7 +1,8 @@
 import { Pane } from 'tweakpane';
+import { REVISION } from 'three';
 
 class Outliner extends Pane {
-    constructor(scene, camera, camControl) {
+    constructor(scene, camera, camControl, renderer) {
         super({
             title: 'Outliner', expanded: false,
         })
@@ -12,36 +13,44 @@ class Outliner extends Pane {
             title: '📸 Camera', expanded: false,
         });
 
-        const positionFolder = this._cameraProps.addFolder({
-            title: 'Position',
-        });
+        {
+            const positionFolder = this._cameraProps.addFolder({
+                title: 'Position',
+            });
 
-        positionFolder.addBinding(this.camera.position, 'x', {
-            readonly: true, label: 'X',
-        });
+            positionFolder.addBinding(this.camera.position, 'x', {
+                readonly: true, label: 'X',
+            });
 
-        positionFolder.addBinding(this.camera.position, 'y', {
-            readonly: true, label: 'Y',
-        });
+            positionFolder.addBinding(this.camera.position, 'y', {
+                readonly: true, label: 'Y',
+            });
 
-        positionFolder.addBinding(this.camera.position, 'z', {
-            readonly: true, label: 'Z',
-        });
+            positionFolder.addBinding(this.camera.position, 'z', {
+                readonly: true, label: 'Z',
+            });
+        }
 
-        const targetFolder = this._cameraProps.addFolder({
-            title: 'Target',
-        });
+        {
+            const targetFolder = this._cameraProps.addFolder({
+                title: 'Target',
+            });
 
-        targetFolder.addBinding(camControl.target, 'x', {
-            readonly: true, label: 'X',
-        });
+            targetFolder.addBinding(camControl.target, 'x', {
+                readonly: true, label: 'X',
+            });
 
-        targetFolder.addBinding(camControl.target, 'y', {
-            readonly: true, label: 'Y',
-        });
+            targetFolder.addBinding(camControl.target, 'y', {
+                readonly: true, label: 'Y',
+            });
 
-        targetFolder.addBinding(camControl.target, 'z', {
-            readonly: true, label: 'Z',
+            targetFolder.addBinding(camControl.target, 'z', {
+                readonly: true, label: 'Z',
+            });
+        }
+        // console.log(renderer);
+        this._resProps = this.addFolder({
+            title: `📈 GPU (Three.js r${REVISION})`, expanded: false,
         });
     }
 }

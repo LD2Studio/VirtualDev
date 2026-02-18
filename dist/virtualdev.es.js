@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Controls, Vector3, MOUSE, TOUCH, Quaternion, Spherical, Vector2, Ray, Plane, MathUtils } from "three";
+import { Controls, Vector3, MOUSE, TOUCH, Quaternion, Spherical, Vector2, Ray, Plane, MathUtils, REVISION } from "three";
 import { Pane } from "tweakpane";
 const _changeEvent = { type: "change" };
 const _startEvent = { type: "start" };
@@ -1189,7 +1189,7 @@ class Input {
   }
 }
 class Outliner extends Pane {
-  constructor(scene, camera, camControl) {
+  constructor(scene, camera, camControl, renderer) {
     super({
       title: "Outliner",
       expanded: false
@@ -1200,35 +1200,43 @@ class Outliner extends Pane {
       title: "📸 Camera",
       expanded: false
     });
-    const positionFolder = this._cameraProps.addFolder({
-      title: "Position"
-    });
-    positionFolder.addBinding(this.camera.position, "x", {
-      readonly: true,
-      label: "X"
-    });
-    positionFolder.addBinding(this.camera.position, "y", {
-      readonly: true,
-      label: "Y"
-    });
-    positionFolder.addBinding(this.camera.position, "z", {
-      readonly: true,
-      label: "Z"
-    });
-    const targetFolder = this._cameraProps.addFolder({
-      title: "Target"
-    });
-    targetFolder.addBinding(camControl.target, "x", {
-      readonly: true,
-      label: "X"
-    });
-    targetFolder.addBinding(camControl.target, "y", {
-      readonly: true,
-      label: "Y"
-    });
-    targetFolder.addBinding(camControl.target, "z", {
-      readonly: true,
-      label: "Z"
+    {
+      const positionFolder = this._cameraProps.addFolder({
+        title: "Position"
+      });
+      positionFolder.addBinding(this.camera.position, "x", {
+        readonly: true,
+        label: "X"
+      });
+      positionFolder.addBinding(this.camera.position, "y", {
+        readonly: true,
+        label: "Y"
+      });
+      positionFolder.addBinding(this.camera.position, "z", {
+        readonly: true,
+        label: "Z"
+      });
+    }
+    {
+      const targetFolder = this._cameraProps.addFolder({
+        title: "Target"
+      });
+      targetFolder.addBinding(camControl.target, "x", {
+        readonly: true,
+        label: "X"
+      });
+      targetFolder.addBinding(camControl.target, "y", {
+        readonly: true,
+        label: "Y"
+      });
+      targetFolder.addBinding(camControl.target, "z", {
+        readonly: true,
+        label: "Z"
+      });
+    }
+    this._resProps = this.addFolder({
+      title: `📈 GPU (Three.js r${REVISION})`,
+      expanded: false
     });
   }
 }
@@ -1342,7 +1350,8 @@ class App {
       this.outliner = new Outliner(
         this.scene,
         this.camera,
-        this.interactiveProps.orbitalControls
+        this.interactiveProps.orbitalControls,
+        this.renderer
       );
     }
     if (vr) {
@@ -1367,10 +1376,18 @@ class App {
     this.sceneTree = EntityManager.getInstance();
     this._clock = new THREE.Clock();
     this._lastTime = this._clock.getElapsedTime();
+    this._firstRender = true;
     const renderLoop = () => {
       const time = this._clock.getElapsedTime();
       const deltaTime = time - this._lastTime;
       this._lastTime = time;
+      if (this._firstRender) {
+        if (this.renderer.isWebGPURenderer) {
+          const backend = this.renderer.backend.isWebGPUBackend ? "WebGPU" : "WebGL2";
+          console.log(backend);
+        }
+        this._firstRender = false;
+      }
       this.onRender(time, deltaTime);
       if (interactive) {
         this.interactiveProps.orbitalControls.update();
