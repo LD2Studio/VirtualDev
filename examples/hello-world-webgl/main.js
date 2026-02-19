@@ -1,11 +1,10 @@
 import * as THREE from 'three';
-import VDEV from 'virtualdev';
+import * as VDEV from 'virtualdev';
 
-const app = VDEV.init(THREE, {
+const app = VDEV.App.init(THREE, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
     monitor: true,
-    antialias: true
 });
 
 const cube = new THREE.Mesh(
