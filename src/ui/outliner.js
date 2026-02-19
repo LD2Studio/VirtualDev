@@ -13,7 +13,7 @@ class Outliner extends Pane {
         this._cameraProps = this.addFolder({
             title: '📸 Camera', expanded: false,
         });
-
+        // Camera position
         {
             const positionFolder = this._cameraProps.addFolder({
                 title: 'Position',
@@ -31,7 +31,7 @@ class Outliner extends Pane {
                 readonly: true, label: 'Z',
             });
         }
-
+        // Camera target
         {
             const targetFolder = this._cameraProps.addFolder({
                 title: 'Target',
@@ -49,25 +49,51 @@ class Outliner extends Pane {
                 readonly: true, label: 'Z',
             });
         }
-
-        this._gpuProps = {
-            backend: renderer.isWebGLRenderer ? 'WebGL' :
-                renderer.isWebGPURenderer ? renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL2' : 'Unknown',
-        }
+        // GPU monitoring
         {
-            const gpuFolder = this.addFolder({
+            this._gpuFolder = this.addFolder({
                 title: `📈 GPU (Three.js r${REVISION})`, expanded: false,
-            });
-
-            gpuFolder.addBinding(this._gpuProps, 'backend', {
-                readonly: true, label: 'Backend',
             });
         }
     }
 
-    update() {
-        this._gpuProps.backend = this.renderer.isWebGLRenderer ? 'WebGL' :
+    addGPUBinding() {
+        const backend = this.renderer.isWebGLRenderer ? 'WebGL' :
             this.renderer.isWebGPURenderer ? this.renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL2' : 'Unknown';
+        this._gpuFolder.addBlade({
+            view: 'text',
+            label: 'Backend',
+            parse: value => value,
+            value: backend,
+            disabled: true,
+        });
+
+        if (this.renderer.isWebGLRenderer) {
+            const renderFolder = this._gpuFolder.addFolder({ title: '🖼️ Render' });
+            renderFolder.addBinding( this.renderer.info.render, 'frame', { label: 'Frame ID', readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'calls', { label: 'DrawCalls', readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'triangles', { readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'points', { readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'lines', { readonly: true} );
+            const memoryFolder = this._gpuFolder.addFolder({ title: '🖥️ Memory' });
+            memoryFolder.addBinding( this.renderer.info.memory, 'geometries', { readonly: true} );
+            memoryFolder.addBinding( this.renderer.info.memory, 'textures', { readonly: true} );
+            const programsFolder = this._gpuFolder.addFolder({ title: '⚡ Shaders' });
+            programsFolder.addBinding( this.renderer.info.programs, 'length', { readonly: true, label: 'Count'} );
+        }
+        else if (this.renderer.isWebGPURenderer) {
+            const renderFolder = this._gpuFolder.addFolder({ title: '🖼️ Render' });
+            renderFolder.addBinding( this.renderer.info, 'frame', { label: 'Frame ID', readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'drawCalls', { label: 'DrawCalls', readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'frameCalls', { label: 'FrameCalls', readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'triangles', { readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'points', { readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'lines', { readonly: true} );
+            renderFolder.addBinding( this.renderer.info.render, 'timestamp', { readonly: true} );
+            const memoryFolder = this._gpuFolder.addFolder({ title: '🖥️ Memory' });
+            memoryFolder.addBinding( this.renderer.info.memory, 'geometries', { label: 'Geometries', readonly: true} );
+            memoryFolder.addBinding( this.renderer.info.memory, 'textures', { label: 'Textures', readonly: true} );
+        }
     }
 }
 

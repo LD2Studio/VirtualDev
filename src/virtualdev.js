@@ -60,9 +60,7 @@ export class App {
             this.renderer = new this.MODULE.WebGLRenderer(renderOptions);
         }
         else {
-            this.renderer = new this.MODULE.WebGPURenderer({
-                antialias
-            });
+            this.renderer = new this.MODULE.WebGPURenderer(renderOptions);
         }
         console.log(`VirtualDev v${version} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
 
@@ -164,7 +162,8 @@ export class App {
             this._lastTime = time;
 
             if (this._firstRender) {
-                if (this.outliner) this.outliner.update();
+                // Add GPU binding on first render
+                if (this.outliner) this.outliner.addGPUBinding();
                 this._firstRender = false;
             }
 

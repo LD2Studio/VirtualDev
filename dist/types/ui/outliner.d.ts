@@ -4,9 +4,7 @@ export class Outliner {
     camera: any;
     renderer: any;
     _cameraProps: any;
-    _gpuProps: {
-        backend: string;
-    };
-    update(): void;
+    _gpuFolder: any;
+    addGPUBinding(): void;
 }
 //# sourceMappingURL=outliner.d.ts.map
