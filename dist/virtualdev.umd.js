@@ -1214,6 +1214,7 @@
       });
       this.scene = scene;
       this.camera = camera;
+      this.renderer = renderer;
       this._cameraProps = this.addFolder({
         title: "📸 Camera",
         expanded: false
@@ -1252,10 +1253,22 @@
           label: "Z"
         });
       }
-      this._resProps = this.addFolder({
-        title: `📈 GPU (Three.js r${THREE.REVISION})`,
-        expanded: false
-      });
+      this._gpuProps = {
+        backend: renderer.isWebGLRenderer ? "WebGL" : renderer.isWebGPURenderer ? renderer.backend.isWebGPUBackend ? "WebGPU" : "WebGL2" : "Unknown"
+      };
+      {
+        const gpuFolder = this.addFolder({
+          title: `📈 GPU (Three.js r${THREE.REVISION})`,
+          expanded: false
+        });
+        gpuFolder.addBinding(this._gpuProps, "backend", {
+          readonly: true,
+          label: "Backend"
+        });
+      }
+    }
+    update() {
+      this._gpuProps.backend = this.renderer.isWebGLRenderer ? "WebGL" : this.renderer.isWebGPURenderer ? this.renderer.backend.isWebGPUBackend ? "WebGPU" : "WebGL2" : "Unknown";
     }
   }
   class EntityManager {
@@ -1398,10 +1411,7 @@
         const deltaTime = time - this._lastTime;
         this._lastTime = time;
         if (this._firstRender) {
-          if (this.renderer.isWebGPURenderer) {
-            const backend = this.renderer.backend.isWebGPUBackend ? "WebGPU" : "WebGL2";
-            console.log(backend);
-          }
+          if (this.outliner) this.outliner.update();
           this._firstRender = false;
         }
         this.onRender(time, deltaTime);

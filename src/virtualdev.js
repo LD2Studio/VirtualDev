@@ -164,10 +164,7 @@ export class App {
             this._lastTime = time;
 
             if (this._firstRender) {
-                if (this.renderer.isWebGPURenderer) {
-                    const backend = this.renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL2';
-                    console.log(backend);
-                }
+                if (this.outliner) this.outliner.update();
                 this._firstRender = false;
             }
 
