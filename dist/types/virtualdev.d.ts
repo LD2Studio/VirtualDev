@@ -1,35 +1,15 @@
 export { Entity };
 /**
- * Application options
- *
- * @typedef {Object} AppOptions
- * @property {string} [name=''] - A name for the application
- * @property {boolean} [interactive=false] - Enable interactive mode
- * @property {boolean} [vr=false] - Enable VR mode
- * @property {boolean} [ar=false] - Enable AR mode
- * @property {boolean} [monitor=false] - Enable monitor mode
- * @property {boolean} [antialias=false] - Enable antialiasing
- */
-/**
  * Class to create a 3D virtual world application
  */
 export class App {
-    static "__#private@#instance": any;
-    /**
-     * Initialize the application
-     *
-     * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
-     * @param {AppOptions} [parameters] - The configuration parameter
-     */
-    static init(renderEngine: typeof THREE, parameters?: AppOptions): any;
-    static getInstance(): any;
     /**
      * Construct a new application
      *
+     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
-    constructor(renderEngine: any, parameters?: AppOptions);
-    MODULE: any;
+    constructor(renderEngine: any, physicsEngine?: any, parameters?: AppOptions);
     webgl: boolean;
     name: string;
     /**
@@ -231,6 +211,7 @@ export class App {
     onRender: (time: any, deltaTime: any) => void;
     onBeforeRender: (time: any, deltaTime: any) => void;
     onAfterRender: (time: any, deltaTime: any) => void;
+    #private;
 }
 /**
  * Application options
@@ -257,9 +238,9 @@ export type AppOptions = {
      */
     monitor?: boolean;
     /**
-     * - Enable antialiasing
+     * - Rendering options
      */
-    antialias?: boolean;
+    renderOptions?: THREE.WebGLRenderer.Options;
 };
 import { Entity } from './core/entity';
 import * as THREE from 'three';

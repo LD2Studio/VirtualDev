@@ -1350,22 +1350,28 @@
     }
   }
   const version = "0.0.4";
+  let instance = null;
   class App {
+    #RENDERER = null;
     /**
      * Construct a new application
      * 
+     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
-    constructor(renderEngine, parameters = {}) {
-      this.MODULE = renderEngine;
-      this.webgl = this.MODULE.WebGLRenderer !== void 0;
+    constructor(renderEngine, physicsEngine = null, parameters = {}) {
+      if (instance) {
+        return instance;
+      }
+      instance = this;
+      this.#RENDERER = renderEngine;
+      this.webgl = this.#RENDERER.WebGLRenderer !== void 0;
       const {
         name = "Untitled",
         interactive = false,
         vr = false,
         ar = false,
         monitor = false,
-        antialias = false,
         renderOptions = {}
       } = parameters;
       this.name = document.title === "" ? name : document.title;
@@ -1373,9 +1379,9 @@
       document.title = this.name;
       this.renderer = null;
       if (this.webgl) {
-        this.renderer = new this.MODULE.WebGLRenderer(renderOptions);
+        this.renderer = new this.#RENDERER.WebGLRenderer(renderOptions);
       } else {
-        this.renderer = new this.MODULE.WebGPURenderer(renderOptions);
+        this.renderer = new this.#RENDERER.WebGPURenderer(renderOptions);
       }
       console.log(`VirtualDev v${version} - ${this.webgl ? "WebGL" : "WebGPU"} renderer`);
       if (this.renderer) {
@@ -1463,25 +1469,6 @@
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.renderer.domElement.clientWidth, this.renderer.domElement.clientHeight, false);
       });
-    }
-    static #instance = null;
-    /**
-     * Initialize the application
-     * 
-     * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
-     * @param {AppOptions} [parameters] - The configuration parameter
-     */
-    static init(renderEngine, parameters) {
-      if (this.#instance === null) {
-        this.#instance = new App(renderEngine, parameters);
-      }
-      return this.#instance;
-    }
-    static getInstance() {
-      if (this.#instance === null) {
-        return null;
-      }
-      return this.#instance;
     }
   }
   class StatsCore {

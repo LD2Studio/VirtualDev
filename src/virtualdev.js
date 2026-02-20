@@ -20,22 +20,30 @@ export { Entity };
  * @property {boolean} [vr=false] - Enable VR mode
  * @property {boolean} [ar=false] - Enable AR mode
  * @property {boolean} [monitor=false] - Enable monitor mode
- * @property {boolean} [antialias=false] - Enable antialiasing
+ * @property {THREE.WebGLRenderer.Options} [renderOptions] - Rendering options
  */
+
+let instance = null;    // Singleton instance
 
 /**
  * Class to create a 3D virtual world application
  */
 export class App {
+    #RENDERER = null;
     /**
      * Construct a new application
      * 
+     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
-    constructor(renderEngine, parameters = {}) {
+    constructor(renderEngine, physicsEngine = null, parameters = {}) {
+        if (instance) {
+            return instance;
+        }
+        instance = this;
         // console.log( renderEngine );
-        this.MODULE = renderEngine;
-        this.webgl = this.MODULE.WebGLRenderer !== undefined;
+        this.#RENDERER = renderEngine;
+        this.webgl = this.#RENDERER.WebGLRenderer !== undefined;
 
         const {
             name = 'Untitled',
@@ -43,7 +51,6 @@ export class App {
             vr = false,
             ar = false,
             monitor = false,
-            antialias = false,
             renderOptions = {}
         } = parameters;
 
@@ -57,10 +64,10 @@ export class App {
          */
         this.renderer = null;
         if (this.webgl) {
-            this.renderer = new this.MODULE.WebGLRenderer(renderOptions);
+            this.renderer = new this.#RENDERER.WebGLRenderer(renderOptions);
         }
         else {
-            this.renderer = new this.MODULE.WebGPURenderer(renderOptions);
+            this.renderer = new this.#RENDERER.WebGPURenderer(renderOptions);
         }
         console.log(`VirtualDev v${version} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
 
@@ -202,26 +209,5 @@ export class App {
             // Update renderer
             this.renderer.setSize( this.renderer.domElement.clientWidth, this.renderer.domElement.clientHeight, false);
         });
-    }
-
-    static #instance = null;
-
-    /**
-     * Initialize the application
-     * 
-     * @param {THREE} renderEngine - The rendering engine (WebGL/WebGPU)
-     * @param {AppOptions} [parameters] - The configuration parameter
-     */
-    static init(renderEngine, parameters) {
-        if (this.#instance === null) {
-            this.#instance = new App(renderEngine, parameters);
-        }
-        return this.#instance;
-    }
-    static getInstance() {
-        if (this.#instance === null) {
-            return null;
-        }
-        return this.#instance;
     }
 }
