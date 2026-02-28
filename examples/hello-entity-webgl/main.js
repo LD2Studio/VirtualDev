@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 import * as VDEV from 'virtualdev';
 
-const app = VDEV.App.init(THREE, {
+const app = new VDEV.App(THREE, null, {
     interactive: true,
-    monitor: true,
 });
 
 const cubeMesh = new THREE.Mesh(

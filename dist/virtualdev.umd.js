@@ -1349,14 +1349,15 @@
       this.children = this.children.filter((c) => c !== child);
     }
   }
-  const version = "0.0.4";
+  const version = "0.1.0-0";
   let instance = null;
+  let RENDER_ENGINE = null;
   class App {
-    #RENDERER = null;
     /**
      * Construct a new application
      * 
-     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {THREE.WebGLRenderer|THREE.WebGPURenderer} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {Object} physicsEngine - The physics engine (Rapier)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
     constructor(renderEngine, physicsEngine = null, parameters = {}) {
@@ -1364,8 +1365,7 @@
         return instance;
       }
       instance = this;
-      this.#RENDERER = renderEngine;
-      this.webgl = this.#RENDERER.WebGLRenderer !== void 0;
+      RENDER_ENGINE = renderEngine;
       const {
         name = "Untitled",
         interactive = false,
@@ -1378,12 +1378,12 @@
       this.name = `${this.name} ${interactive ? "(Interactive)" : ""}`;
       document.title = this.name;
       this.renderer = null;
-      if (this.webgl) {
-        this.renderer = new this.#RENDERER.WebGLRenderer(renderOptions);
+      if (RENDER_ENGINE.WebGLRenderer !== void 0) {
+        this.renderer = new RENDER_ENGINE.WebGLRenderer(renderOptions);
       } else {
-        this.renderer = new this.#RENDERER.WebGPURenderer(renderOptions);
+        this.renderer = new RENDER_ENGINE.WebGPURenderer(renderOptions);
       }
-      console.log(`VirtualDev v${version} - ${this.webgl ? "WebGL" : "WebGPU"} renderer`);
+      console.log(`VirtualDev v${version} - ${RENDER_ENGINE.WebGLRenderer !== void 0 ? "WebGL" : "WebGPU"} renderer`);
       if (this.renderer) {
         this.renderer.setSize(window.innerWidth, window.innerHeight, false);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1400,15 +1400,13 @@
       this.camera = new THREE__namespace.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
       this.camera.position.z = 5;
       this.inputs = new Input();
-      this.interactive = interactive;
-      this.interactiveProps = {};
-      if (this.interactive) {
-        this.interactiveProps.orbitalControls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.interactiveProps.orbitalControls.enableDamping = true;
+      if (interactive) {
+        this.orbitalControls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitalControls.enableDamping = true;
         this.outliner = new Outliner(
           this.scene,
           this.camera,
-          this.interactiveProps.orbitalControls,
+          this.orbitalControls,
           this.renderer
         );
       }
@@ -1445,7 +1443,7 @@
         }
         this.onRender(time, deltaTime);
         if (interactive) {
-          this.interactiveProps.orbitalControls.update();
+          this.orbitalControls.update();
         }
         if (this.stats) {
           this.stats.update();

@@ -1,10 +1,9 @@
 import * as THREE from 'three/webgpu';
 import * as VDEV from 'virtualdev';
 
-const app = VDEV.App.init(THREE, {
+const app = new VDEV.App(THREE, null, {
     name: "VirtualDev - Hello WebGPU",
     interactive: true,
-    monitor: true
 });
 
 const cube = new THREE.Mesh(

@@ -24,16 +24,17 @@ export { Entity };
  */
 
 let instance = null;    // Singleton instance
+let RENDER_ENGINE = null;   // Render Engine used
 
 /**
  * Class to create a 3D virtual world application
  */
 export class App {
-    #RENDERER = null;
     /**
      * Construct a new application
      * 
-     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {THREE.WebGLRenderer|THREE.WebGPURenderer} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {Object} physicsEngine - The physics engine (Rapier)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
     constructor(renderEngine, physicsEngine = null, parameters = {}) {
@@ -41,9 +42,8 @@ export class App {
             return instance;
         }
         instance = this;
-        // console.log( renderEngine );
-        this.#RENDERER = renderEngine;
-        this.webgl = this.#RENDERER.WebGLRenderer !== undefined;
+
+        RENDER_ENGINE = renderEngine;
 
         const {
             name = 'Untitled',
@@ -63,13 +63,13 @@ export class App {
          * @type {THREE.WebGLRenderer|THREE.WebGPURenderer}
          */
         this.renderer = null;
-        if (this.webgl) {
-            this.renderer = new this.#RENDERER.WebGLRenderer(renderOptions);
+        if (RENDER_ENGINE.WebGLRenderer !== undefined) {
+            this.renderer = new RENDER_ENGINE.WebGLRenderer(renderOptions);
         }
         else {
-            this.renderer = new this.#RENDERER.WebGPURenderer(renderOptions);
+            this.renderer = new RENDER_ENGINE.WebGPURenderer(renderOptions);
         }
-        console.log(`VirtualDev v${version} - ${this.webgl ? 'WebGL' : 'WebGPU'} renderer`);
+        console.log(`VirtualDev v${version} - ${RENDER_ENGINE.WebGLRenderer !== undefined ? 'WebGL' : 'WebGPU'} renderer`);
 
         if (this.renderer) {
             this.renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -119,14 +119,12 @@ export class App {
          */
         this.inputs = new Input();
 
-        this.interactive = interactive;
-        this.interactiveProps = {};
-        if (this.interactive) {
-            this.interactiveProps.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
-            this.interactiveProps.orbitalControls.enableDamping = true;
+        if (interactive) {
+            this.orbitalControls = new OrbitControls( this.camera, this.renderer.domElement );
+            this.orbitalControls.enableDamping = true;
             this.outliner = new Outliner(
                 this.scene, this.camera,
-                this.interactiveProps.orbitalControls,
+                this.orbitalControls,
                 this.renderer
              );
         }
@@ -177,7 +175,7 @@ export class App {
             this.onRender(time, deltaTime);
 
             if (interactive) {
-                this.interactiveProps.orbitalControls.update();
+                this.orbitalControls.update();
             }
             if (this.stats) {
                 this.stats.update();

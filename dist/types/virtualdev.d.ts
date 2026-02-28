@@ -6,11 +6,11 @@ export class App {
     /**
      * Construct a new application
      *
-     * @param {Object} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {THREE.WebGLRenderer|THREE.WebGPURenderer} renderEngine - The rendering engine (WebGL/WebGPU)
+     * @param {Object} physicsEngine - The physics engine (Rapier)
      * @param {AppOptions} [parameters] - The configuration parameter
      */
-    constructor(renderEngine: any, physicsEngine?: any, parameters?: AppOptions);
-    webgl: boolean;
+    constructor(renderEngine: THREE.WebGLRenderer | THREE.WebGPURenderer, physicsEngine?: any, parameters?: AppOptions);
     name: string;
     /**
      * The rendering system
@@ -45,8 +45,7 @@ export class App {
      * }
      */
     inputs: any;
-    interactive: boolean;
-    interactiveProps: {};
+    orbitalControls: any;
     outliner: Outliner;
     stats: {
         fpsPanel: any;
@@ -211,7 +210,6 @@ export class App {
     onRender: (time: any, deltaTime: any) => void;
     onBeforeRender: (time: any, deltaTime: any) => void;
     onAfterRender: (time: any, deltaTime: any) => void;
-    #private;
 }
 /**
  * Application options

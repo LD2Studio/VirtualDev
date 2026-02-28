@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import * as VDEV from 'virtualdev';
 
-const app = VDEV.App.init(THREE, {
+const app = new VDEV.App(THREE, null, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
-    monitor: true,
 });
 
 const cube = new THREE.Mesh(
@@ -12,4 +11,3 @@ const cube = new THREE.Mesh(
     new THREE.MeshMatcapMaterial()
 );
 app.scene.add(cube);
-
