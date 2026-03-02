@@ -1,0 +1,27 @@
+---
+title: VirtualDev
+description: Créer des applications Web immersives.
+template: splash # Remove or comment out this line to display the site sidebar on this page.
+hero:
+  tagline: Créer des applications Web immersives.
+  image:
+    file: ../../assets/virtualdev.drawio.svg
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Les prochaines étapes
+
+<CardGrid stagger>
+	<LinkCard
+		title="Prise en main de VirtualDev"
+		href="/virtualdev/intro/"
+		description="Commencer à créer des applications avec VirtualDev."
+	/>
+	<Card title="Add new content" icon="add-document">
+		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	</Card>
+	<Card title="Configure your site" icon="setting">
+		Edit your `sidebar` and other config in `astro.config.mjs`.
+	</Card>
+</CardGrid>
