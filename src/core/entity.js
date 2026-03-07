@@ -1,12 +1,10 @@
 const entities = [];
+const rigidBodies = [];
 
 export class EntityManager {
     constructor( scene, physics ) {
         this.scene = scene;
-        // this.physics = physics
-
-        // Array of physics object
-        this._phyObjects = [];
+        this.physics = physics;
     }
 
     static #instance = null;
@@ -24,16 +22,20 @@ export class EntityManager {
         return this.#instance;
     }
 
+    get entities() {
+        return entities;
+    }
+
     add( entity ) {
         entities.push( entity );
         // console.log('add entity: ', entity);
         entity.children.forEach( c => {
             // console.log(c);
-            if (c.isObject3D) {
-                this.scene.add(c);
+            if (c.mesh && c.mesh.isObject3D) {
+                this.scene.add(c.mesh);
             }
-            else if (c.rigidBody !== undefined) {
-                this._phyObjects.push(c);
+            if (c.rigidBody) {
+                rigidBodies.push(c);
             }
         })
     }
@@ -43,10 +45,9 @@ export class EntityManager {
     }
 
     update() {
-        // console.log(this._phyObjects);
-        this._phyObjects.forEach( obj => {
+        rigidBodies.forEach( obj => {
             // console.log(obj)
-            if (obj.rigidBody !== undefined) {
+            if (obj.rigidBody) {
                 // console.log(obj.rigidBody);
                 if (obj.rigidBody.isDynamic()) {
                     // console.log('Obj is dynamic');

@@ -25,6 +25,12 @@ export { Entity };
 
 let instance = null;    // Singleton instance
 let RENDER_ENGINE = null;   // Render Engine used
+let PHYSICS_ENGINE = null;  // Physics Engine used
+const physics = {
+    timeAcc: 0,
+    isRunning: true,
+    oneShot: false,
+}
 
 /**
  * Class to create a 3D virtual world application
@@ -44,6 +50,7 @@ export class App {
         instance = this;
 
         RENDER_ENGINE = renderEngine;
+        PHYSICS_ENGINE = physicsEngine;
 
         const {
             name = 'Untitled',
@@ -91,7 +98,6 @@ export class App {
          * @type {THREE.Scene}
          */
         this.scene = new THREE.Scene();
-        // this.scene.background = new THREE.Color( 0x606060 );
 
         /**
          * The camera
@@ -99,6 +105,15 @@ export class App {
          */
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.camera.position.z = 5;
+
+        this.world = null;
+        if (PHYSICS_ENGINE !== null) {
+            this.world = new PHYSICS_ENGINE.World({
+                x: 0, y: -9.81, z: 0
+            });
+
+            console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`)
+        }
 
         /**
          * The input manager
@@ -154,7 +169,7 @@ export class App {
 
         // Entities Manager
         // Instanciate Entity Manager
-        EntityManager.init( this.scene );
+        EntityManager.init( this.scene, this.world );
         this.sceneTree = EntityManager.getInstance();
 
         this._clock = new THREE.Clock();
@@ -173,6 +188,33 @@ export class App {
             }
 
             this.onRender(time, deltaTime);
+
+            if (this.world) {
+                // console.log(deltaTime);
+                physics.timeAcc += deltaTime;
+                const TIMESTEP = this.world.timestep;
+                const MAX_STEPS = 5;
+
+                let step_count = 0;
+                while (physics.timeAcc >= TIMESTEP) {
+                    if (physics.isRunning) {
+                        this.world.step();
+                        // console.log('phy step')
+                        if (physics.oneShot) {
+                            physics.oneShot = false;
+                            physics.isRunning = false;
+                        }
+                    }
+                    physics.timeAcc -= TIMESTEP;
+
+                    step_count++;
+                    if (step_count >= MAX_STEPS) {
+                        physics.timeAcc = 0;
+                        break;
+                    }
+                }
+                this.sceneTree.update();
+            }
 
             if (interactive) {
                 this.orbitalControls.update();
