@@ -221,7 +221,7 @@ export class App {
             }
             if (this.stats) {
                 this.stats.update();
-                if (!this.webgl) {
+                if (RENDER_ENGINE.WebGLRenderer === undefined) {
                     this.renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
                 }
             }
