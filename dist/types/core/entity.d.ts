@@ -4,7 +4,8 @@ export class EntityManager {
     static getInstance(): any;
     constructor(scene: any, physics: any);
     scene: any;
-    _phyObjects: any[];
+    physics: any;
+    get entities(): any[];
     add(entity: any): void;
     remove(entity: any): void;
     update(): void;

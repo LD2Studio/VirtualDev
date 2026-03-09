@@ -27,6 +27,7 @@ export class App {
      * @type {THREE.PerspectiveCamera}
      */
     camera: THREE.PerspectiveCamera;
+    world: any;
     /**
      * The input manager
      * @example

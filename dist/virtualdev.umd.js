@@ -1296,15 +1296,17 @@
       }
     }
   }
+  const entities = [];
+  const rigidBodies = [];
   class EntityManager {
-    constructor(scene, physics) {
+    constructor(scene, physics2) {
       this.scene = scene;
-      this._phyObjects = [];
+      this.physics = physics2;
     }
     static #instance = null;
-    static init(scene, physics) {
+    static init(scene, physics2) {
       if (this.#instance === null) {
-        this.#instance = new EntityManager(scene, physics);
+        this.#instance = new EntityManager(scene, physics2);
       }
     }
     static getInstance() {
@@ -1313,20 +1315,25 @@
       }
       return this.#instance;
     }
+    get entities() {
+      return entities;
+    }
     add(entity) {
+      entities.push(entity);
       entity.children.forEach((c) => {
-        if (c.isObject3D) {
-          this.scene.add(c);
-        } else if (c.rigidBody !== void 0) {
-          this._phyObjects.push(c);
+        if (c.mesh && c.mesh.isObject3D) {
+          this.scene.add(c.mesh);
+        }
+        if (c.rigidBody) {
+          rigidBodies.push(c);
         }
       });
     }
     remove(entity) {
     }
     update() {
-      this._phyObjects.forEach((obj) => {
-        if (obj.rigidBody !== void 0) {
+      rigidBodies.forEach((obj) => {
+        if (obj.rigidBody) {
           if (obj.rigidBody.isDynamic()) {
             obj.mesh.position.copy(obj.rigidBody.translation());
             obj.mesh.quaternion.copy(obj.rigidBody.rotation());
@@ -1349,9 +1356,13 @@
       this.children = this.children.filter((c) => c !== child);
     }
   }
-  const version = "0.1.0-0";
+  const version = "0.1.0";
   let instance = null;
   let RENDER_ENGINE = null;
+  let PHYSICS_ENGINE = null;
+  const physics = {
+    timeAcc: 0
+  };
   class App {
     /**
      * Construct a new application
@@ -1366,6 +1377,7 @@
       }
       instance = this;
       RENDER_ENGINE = renderEngine;
+      PHYSICS_ENGINE = physicsEngine;
       const {
         name = "Untitled",
         interactive = false,
@@ -1399,6 +1411,15 @@
       this.scene = new THREE__namespace.Scene();
       this.camera = new THREE__namespace.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
       this.camera.position.z = 5;
+      this.world = null;
+      if (PHYSICS_ENGINE !== null) {
+        this.world = new PHYSICS_ENGINE.World({
+          x: 0,
+          y: -9.81,
+          z: 0
+        });
+        console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`);
+      }
       this.inputs = new Input();
       if (interactive) {
         this.orbitalControls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -1428,7 +1449,7 @@
           this.stats.init(this.renderer);
         });
       }
-      EntityManager.init(this.scene);
+      EntityManager.init(this.scene, this.world);
       this.sceneTree = EntityManager.getInstance();
       this._clock = new THREE__namespace.Clock();
       this._lastTime = this._clock.getElapsedTime();
@@ -1442,12 +1463,30 @@
           this._firstRender = false;
         }
         this.onRender(time, deltaTime);
+        if (this.world) {
+          physics.timeAcc += deltaTime;
+          const TIMESTEP = this.world.timestep;
+          const MAX_STEPS = 5;
+          let step_count = 0;
+          while (physics.timeAcc >= TIMESTEP) {
+            {
+              this.world.step();
+            }
+            physics.timeAcc -= TIMESTEP;
+            step_count++;
+            if (step_count >= MAX_STEPS) {
+              physics.timeAcc = 0;
+              break;
+            }
+          }
+          this.sceneTree.update();
+        }
         if (interactive) {
           this.orbitalControls.update();
         }
         if (this.stats) {
           this.stats.update();
-          if (!this.webgl) {
+          if (RENDER_ENGINE.WebGLRenderer === void 0) {
             this.renderer.resolveTimestampsAsync(THREE__namespace.TimestampQuery.RENDER);
           }
         }
