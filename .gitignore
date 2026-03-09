@@ -5,3 +5,5 @@ package-lock.json
 tests/
 # dist/
 roadmap/
+docs/.vitepress/dist
+docs/.vitepress/cache

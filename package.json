@@ -19,13 +19,17 @@
   ],
   "scripts": {
     "build": "vite build && npm run build:types",
-    "build:types": "tsc"
+    "build:types": "tsc",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@tweakpane/core": "^2.0.5",
     "@types/three": "^0.182.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitepress": "^2.0.0-alpha.16"
   },
   "peerDependencies": {
     "three": "^0.182.0",
