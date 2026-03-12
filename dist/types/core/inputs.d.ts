@@ -14,7 +14,7 @@ export class Input {
      * - name: The name of the action
      * - keys: An array of keys that will trigger the action
      */
-    set actions(newActions: any[]);
+    set map(newActions: any[]);
     isPressed(actionName: any): any;
     isJustPressed(actionName: any): boolean;
     _down(key: any): void;

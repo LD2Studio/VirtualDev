@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE$1 from "three";
 import { Controls, Vector3, MOUSE, TOUCH, Quaternion, Spherical, Vector2, Ray, Plane, MathUtils, REVISION } from "three";
 import { Pane } from "tweakpane";
 const _changeEvent = { type: "change" };
@@ -1114,7 +1114,7 @@ class Input {
    * @private
    * @example
    * const input = new Input();
-   * input.actions = [
+   * input.map = [
    *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
    *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
    *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
@@ -1149,7 +1149,7 @@ class Input {
    * - name: The name of the action
    * - keys: An array of keys that will trigger the action
    */
-  set actions(newActions) {
+  set map(newActions) {
     this._actions = newActions;
     this._actions.forEach((action) => {
       this.actionState[action.name] = {
@@ -1279,16 +1279,17 @@ class Outliner extends Pane {
   }
 }
 const entities = [];
-const rigidBodies = [];
+let THREE;
 class EntityManager {
-  constructor(scene, physics2) {
+  constructor(render, physics2, scene, world) {
     this.scene = scene;
-    this.physics = physics2;
+    this.world = world;
+    THREE = render;
   }
   static #instance = null;
-  static init(scene, physics2) {
+  static init(render, physics2, scene, world) {
     if (this.#instance === null) {
-      this.#instance = new EntityManager(scene, physics2);
+      this.#instance = new EntityManager(render, physics2, scene, world);
     }
   }
   static getInstance() {
@@ -1300,21 +1301,44 @@ class EntityManager {
   get entities() {
     return entities;
   }
-  add(entity) {
-    entities.push(entity);
-    entity.children.forEach((c) => {
-      if (c.mesh && c.mesh.isObject3D) {
-        this.scene.add(c.mesh);
+  create(entity) {
+    if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+      console.error("Geometry is not defined");
+      return;
+    }
+    const mesh = new THREE.Mesh(entity.geometry, entity.material);
+    mesh.position.copy(entity.position);
+    mesh.rotation.copy(entity.rotation);
+    mesh.scale.copy(entity.scale);
+    let rigidBody = null;
+    if (entity.rigidBodyDesc && entity.colliderDesc) {
+      rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
+      this.world.createCollider(entity.colliderDesc, rigidBody);
+      rigidBody.setTranslation(entity.position);
+    }
+    const instance2 = {
+      name: entity.name,
+      position: entity.position,
+      rotation: entity.rotation,
+      scale: entity.scale,
+      uuid: crypto.randomUUID(),
+      mesh,
+      rigidBody,
+      set position(pos) {
+        mesh.position.copy(pos);
+        if (this.rigidBody) {
+          this.rigidBody.setTranslation(pos);
+        }
       }
-      if (c.rigidBody) {
-        rigidBodies.push(c);
-      }
-    });
+    };
+    this.scene.add(mesh);
+    entities.push(instance2);
+    return instance2;
   }
   remove(entity) {
   }
   update() {
-    rigidBodies.forEach((obj) => {
+    entities.forEach((obj) => {
       if (obj.rigidBody) {
         if (obj.rigidBody.isDynamic()) {
           obj.mesh.position.copy(obj.rigidBody.translation());
@@ -1327,15 +1351,26 @@ class EntityManager {
 class Entity {
   constructor(name) {
     this.name = name;
-    this.children = [];
+    this.uuid = crypto.randomUUID();
+    this.position = new THREE.Vector3(0, 0, 0);
+    this.rotation = new THREE.Euler(0, 0, 0);
+    this.scale = new THREE.Vector3(1, 1, 1);
+    this.geometry = null;
+    this.material = new THREE.MeshBasicMaterial();
+    this.colliderDesc = null;
+    this.rigidBodyDesc = null;
   }
-  init() {
+  setGeometry(geometry) {
+    this.geometry = geometry;
   }
-  add(child) {
-    this.children.push(child);
+  setMaterial(material) {
+    this.material = material;
   }
-  remove(child) {
-    this.children = this.children.filter((c) => c !== child);
+  setCollider(colliderDesc) {
+    this.colliderDesc = colliderDesc;
+  }
+  setRigidBody(rigidBodyDesc) {
+    this.rigidBodyDesc = rigidBodyDesc;
   }
 }
 const version = "0.1.0";
@@ -1390,8 +1425,8 @@ class App {
         canvas.parentNode.style.height = "100vh";
       }
     }
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
+    this.scene = new THREE$1.Scene();
+    this.camera = new THREE$1.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
     this.camera.position.z = 5;
     this.world = null;
     if (PHYSICS_ENGINE !== null) {
@@ -1431,9 +1466,9 @@ class App {
         this.stats.init(this.renderer);
       });
     }
-    EntityManager.init(this.scene, this.world);
+    EntityManager.init(RENDER_ENGINE, PHYSICS_ENGINE, this.scene, this.world);
     this.sceneTree = EntityManager.getInstance();
-    this._clock = new THREE.Clock();
+    this._clock = new THREE$1.Clock();
     this._lastTime = this._clock.getElapsedTime();
     this._firstRender = true;
     const renderLoop = () => {
@@ -1469,7 +1504,7 @@ class App {
       if (this.stats) {
         this.stats.update();
         if (RENDER_ENGINE.WebGLRenderer === void 0) {
-          this.renderer.resolveTimestampsAsync(THREE.TimestampQuery.RENDER);
+          this.renderer.resolveTimestampsAsync(THREE$1.TimestampQuery.RENDER);
         }
       }
       this.onBeforeRender(time, deltaTime);

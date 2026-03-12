@@ -5,11 +5,11 @@ const app = new VDEV.App(THREE, null, {
     interactive: true,
 });
 
-const cubeMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshMatcapMaterial()
-);
 
+// Create cube entity
 const cube = new VDEV.Entity('Cube');
-cube.add(cubeMesh);
-app.sceneTree.add(cube);
+cube.setGeometry( new THREE.BoxGeometry() );
+cube.setMaterial( new THREE.MeshMatcapMaterial({ color: 'red' }) );
+cube.position = new THREE.Vector3(0, 2, 0);
+
+app.sceneTree.create(cube);

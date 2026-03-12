@@ -9,7 +9,7 @@ class Input {
      * @private
      * @example
      * const input = new Input();
-     * input.actions = [
+     * input.map = [
      *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
      *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
      *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
@@ -50,7 +50,7 @@ class Input {
      * - name: The name of the action
      * - keys: An array of keys that will trigger the action
      */
-    set actions(newActions) {
+    set map(newActions) {
         this._actions = newActions;
         this._actions.forEach( action => {
             this.actionState[action.name] = {

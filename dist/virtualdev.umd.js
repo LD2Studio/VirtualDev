@@ -1,6 +1,6 @@
 (function(global, factory) {
   typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("three"), require("tweakpane")) : typeof define === "function" && define.amd ? define(["exports", "three", "tweakpane"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global.vdev = {}, global.THREE, global.tweakpane));
-})(this, (function(exports2, THREE, tweakpane) {
+})(this, (function(exports2, THREE$1, tweakpane) {
   "use strict";
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
@@ -18,14 +18,14 @@
     n.default = e;
     return Object.freeze(n);
   }
-  const THREE__namespace = /* @__PURE__ */ _interopNamespaceDefault(THREE);
+  const THREE__namespace = /* @__PURE__ */ _interopNamespaceDefault(THREE$1);
   const _changeEvent = { type: "change" };
   const _startEvent = { type: "start" };
   const _endEvent = { type: "end" };
-  const _ray = new THREE.Ray();
-  const _plane = new THREE.Plane();
-  const _TILT_LIMIT = Math.cos(70 * THREE.MathUtils.DEG2RAD);
-  const _v = new THREE.Vector3();
+  const _ray = new THREE$1.Ray();
+  const _plane = new THREE$1.Plane();
+  const _TILT_LIMIT = Math.cos(70 * THREE$1.MathUtils.DEG2RAD);
+  const _v = new THREE$1.Vector3();
   const _twoPI = 2 * Math.PI;
   const _STATE = {
     NONE: -1,
@@ -38,7 +38,7 @@
     TOUCH_DOLLY_ROTATE: 6
   };
   const _EPS = 1e-6;
-  class OrbitControls extends THREE.Controls {
+  class OrbitControls extends THREE$1.Controls {
     /**
      * Constructs a new controls instance.
      *
@@ -48,8 +48,8 @@
     constructor(object, domElement = null) {
       super(object, domElement);
       this.state = _STATE.NONE;
-      this.target = new THREE.Vector3();
-      this.cursor = new THREE.Vector3();
+      this.target = new THREE$1.Vector3();
+      this.cursor = new THREE$1.Vector3();
       this.minDistance = 0;
       this.maxDistance = Infinity;
       this.minZoom = 0;
@@ -75,32 +75,32 @@
       this.autoRotate = false;
       this.autoRotateSpeed = 2;
       this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
-      this.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-      this.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+      this.mouseButtons = { LEFT: THREE$1.MOUSE.ROTATE, MIDDLE: THREE$1.MOUSE.DOLLY, RIGHT: THREE$1.MOUSE.PAN };
+      this.touches = { ONE: THREE$1.TOUCH.ROTATE, TWO: THREE$1.TOUCH.DOLLY_PAN };
       this.target0 = this.target.clone();
       this.position0 = this.object.position.clone();
       this.zoom0 = this.object.zoom;
       this._domElementKeyEvents = null;
-      this._lastPosition = new THREE.Vector3();
-      this._lastQuaternion = new THREE.Quaternion();
-      this._lastTargetPosition = new THREE.Vector3();
-      this._quat = new THREE.Quaternion().setFromUnitVectors(object.up, new THREE.Vector3(0, 1, 0));
+      this._lastPosition = new THREE$1.Vector3();
+      this._lastQuaternion = new THREE$1.Quaternion();
+      this._lastTargetPosition = new THREE$1.Vector3();
+      this._quat = new THREE$1.Quaternion().setFromUnitVectors(object.up, new THREE$1.Vector3(0, 1, 0));
       this._quatInverse = this._quat.clone().invert();
-      this._spherical = new THREE.Spherical();
-      this._sphericalDelta = new THREE.Spherical();
+      this._spherical = new THREE$1.Spherical();
+      this._sphericalDelta = new THREE$1.Spherical();
       this._scale = 1;
-      this._panOffset = new THREE.Vector3();
-      this._rotateStart = new THREE.Vector2();
-      this._rotateEnd = new THREE.Vector2();
-      this._rotateDelta = new THREE.Vector2();
-      this._panStart = new THREE.Vector2();
-      this._panEnd = new THREE.Vector2();
-      this._panDelta = new THREE.Vector2();
-      this._dollyStart = new THREE.Vector2();
-      this._dollyEnd = new THREE.Vector2();
-      this._dollyDelta = new THREE.Vector2();
-      this._dollyDirection = new THREE.Vector3();
-      this._mouse = new THREE.Vector2();
+      this._panOffset = new THREE$1.Vector3();
+      this._rotateStart = new THREE$1.Vector2();
+      this._rotateEnd = new THREE$1.Vector2();
+      this._rotateDelta = new THREE$1.Vector2();
+      this._panStart = new THREE$1.Vector2();
+      this._panEnd = new THREE$1.Vector2();
+      this._panDelta = new THREE$1.Vector2();
+      this._dollyStart = new THREE$1.Vector2();
+      this._dollyEnd = new THREE$1.Vector2();
+      this._dollyDelta = new THREE$1.Vector2();
+      this._dollyDirection = new THREE$1.Vector3();
+      this._mouse = new THREE$1.Vector2();
       this._performCursorZoom = false;
       this._pointers = [];
       this._pointerPositions = {};
@@ -279,13 +279,13 @@
           this.object.updateMatrixWorld();
           zoomChanged = !!radiusDelta;
         } else if (this.object.isOrthographicCamera) {
-          const mouseBefore = new THREE.Vector3(this._mouse.x, this._mouse.y, 0);
+          const mouseBefore = new THREE$1.Vector3(this._mouse.x, this._mouse.y, 0);
           mouseBefore.unproject(this.object);
           const prevZoom = this.object.zoom;
           this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / this._scale));
           this.object.updateProjectionMatrix();
           zoomChanged = prevZoom !== this.object.zoom;
-          const mouseAfter = new THREE.Vector3(this._mouse.x, this._mouse.y, 0);
+          const mouseAfter = new THREE$1.Vector3(this._mouse.x, this._mouse.y, 0);
           mouseAfter.unproject(this.object);
           this.object.position.sub(mouseAfter).add(mouseBefore);
           this.object.updateMatrixWorld();
@@ -622,7 +622,7 @@
     _trackPointer(event) {
       let position = this._pointerPositions[event.pointerId];
       if (position === void 0) {
-        position = new THREE.Vector2();
+        position = new THREE$1.Vector2();
         this._pointerPositions[event.pointerId] = position;
       }
       position.set(event.pageX, event.pageY);
@@ -709,12 +709,12 @@
         mouseAction = -1;
     }
     switch (mouseAction) {
-      case THREE.MOUSE.DOLLY:
+      case THREE$1.MOUSE.DOLLY:
         if (this.enableZoom === false) return;
         this._handleMouseDownDolly(event);
         this.state = _STATE.DOLLY;
         break;
-      case THREE.MOUSE.ROTATE:
+      case THREE$1.MOUSE.ROTATE:
         if (event.ctrlKey || event.metaKey || event.shiftKey) {
           if (this.enablePan === false) return;
           this._handleMouseDownPan(event);
@@ -725,7 +725,7 @@
           this.state = _STATE.ROTATE;
         }
         break;
-      case THREE.MOUSE.PAN:
+      case THREE$1.MOUSE.PAN:
         if (event.ctrlKey || event.metaKey || event.shiftKey) {
           if (this.enableRotate === false) return;
           this._handleMouseDownRotate(event);
@@ -775,12 +775,12 @@
     switch (this._pointers.length) {
       case 1:
         switch (this.touches.ONE) {
-          case THREE.TOUCH.ROTATE:
+          case THREE$1.TOUCH.ROTATE:
             if (this.enableRotate === false) return;
             this._handleTouchStartRotate(event);
             this.state = _STATE.TOUCH_ROTATE;
             break;
-          case THREE.TOUCH.PAN:
+          case THREE$1.TOUCH.PAN:
             if (this.enablePan === false) return;
             this._handleTouchStartPan(event);
             this.state = _STATE.TOUCH_PAN;
@@ -791,12 +791,12 @@
         break;
       case 2:
         switch (this.touches.TWO) {
-          case THREE.TOUCH.DOLLY_PAN:
+          case THREE$1.TOUCH.DOLLY_PAN:
             if (this.enableZoom === false && this.enablePan === false) return;
             this._handleTouchStartDollyPan(event);
             this.state = _STATE.TOUCH_DOLLY_PAN;
             break;
-          case THREE.TOUCH.DOLLY_ROTATE:
+          case THREE$1.TOUCH.DOLLY_ROTATE:
             if (this.enableZoom === false && this.enableRotate === false) return;
             this._handleTouchStartDollyRotate(event);
             this.state = _STATE.TOUCH_DOLLY_ROTATE;
@@ -1132,7 +1132,7 @@
      * @private
      * @example
      * const input = new Input();
-     * input.actions = [
+     * input.map = [
      *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
      *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
      *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
@@ -1167,7 +1167,7 @@
      * - name: The name of the action
      * - keys: An array of keys that will trigger the action
      */
-    set actions(newActions) {
+    set map(newActions) {
       this._actions = newActions;
       this._actions.forEach((action) => {
         this.actionState[action.name] = {
@@ -1255,7 +1255,7 @@
       }
       {
         this._gpuFolder = this.addFolder({
-          title: `📈 GPU (Three.js r${THREE.REVISION})`,
+          title: `📈 GPU (Three.js r${THREE$1.REVISION})`,
           expanded: false
         });
       }
@@ -1297,16 +1297,17 @@
     }
   }
   const entities = [];
-  const rigidBodies = [];
+  let THREE;
   class EntityManager {
-    constructor(scene, physics2) {
+    constructor(render, physics2, scene, world) {
       this.scene = scene;
-      this.physics = physics2;
+      this.world = world;
+      THREE = render;
     }
     static #instance = null;
-    static init(scene, physics2) {
+    static init(render, physics2, scene, world) {
       if (this.#instance === null) {
-        this.#instance = new EntityManager(scene, physics2);
+        this.#instance = new EntityManager(render, physics2, scene, world);
       }
     }
     static getInstance() {
@@ -1318,21 +1319,44 @@
     get entities() {
       return entities;
     }
-    add(entity) {
-      entities.push(entity);
-      entity.children.forEach((c) => {
-        if (c.mesh && c.mesh.isObject3D) {
-          this.scene.add(c.mesh);
+    create(entity) {
+      if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+        console.error("Geometry is not defined");
+        return;
+      }
+      const mesh = new THREE.Mesh(entity.geometry, entity.material);
+      mesh.position.copy(entity.position);
+      mesh.rotation.copy(entity.rotation);
+      mesh.scale.copy(entity.scale);
+      let rigidBody = null;
+      if (entity.rigidBodyDesc && entity.colliderDesc) {
+        rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
+        this.world.createCollider(entity.colliderDesc, rigidBody);
+        rigidBody.setTranslation(entity.position);
+      }
+      const instance2 = {
+        name: entity.name,
+        position: entity.position,
+        rotation: entity.rotation,
+        scale: entity.scale,
+        uuid: crypto.randomUUID(),
+        mesh,
+        rigidBody,
+        set position(pos) {
+          mesh.position.copy(pos);
+          if (this.rigidBody) {
+            this.rigidBody.setTranslation(pos);
+          }
         }
-        if (c.rigidBody) {
-          rigidBodies.push(c);
-        }
-      });
+      };
+      this.scene.add(mesh);
+      entities.push(instance2);
+      return instance2;
     }
     remove(entity) {
     }
     update() {
-      rigidBodies.forEach((obj) => {
+      entities.forEach((obj) => {
         if (obj.rigidBody) {
           if (obj.rigidBody.isDynamic()) {
             obj.mesh.position.copy(obj.rigidBody.translation());
@@ -1345,15 +1369,26 @@
   class Entity {
     constructor(name) {
       this.name = name;
-      this.children = [];
+      this.uuid = crypto.randomUUID();
+      this.position = new THREE.Vector3(0, 0, 0);
+      this.rotation = new THREE.Euler(0, 0, 0);
+      this.scale = new THREE.Vector3(1, 1, 1);
+      this.geometry = null;
+      this.material = new THREE.MeshBasicMaterial();
+      this.colliderDesc = null;
+      this.rigidBodyDesc = null;
     }
-    init() {
+    setGeometry(geometry) {
+      this.geometry = geometry;
     }
-    add(child) {
-      this.children.push(child);
+    setMaterial(material) {
+      this.material = material;
     }
-    remove(child) {
-      this.children = this.children.filter((c) => c !== child);
+    setCollider(colliderDesc) {
+      this.colliderDesc = colliderDesc;
+    }
+    setRigidBody(rigidBodyDesc) {
+      this.rigidBodyDesc = rigidBodyDesc;
     }
   }
   const version = "0.1.0";
@@ -1449,7 +1484,7 @@
           this.stats.init(this.renderer);
         });
       }
-      EntityManager.init(this.scene, this.world);
+      EntityManager.init(RENDER_ENGINE, PHYSICS_ENGINE, this.scene, this.world);
       this.sceneTree = EntityManager.getInstance();
       this._clock = new THREE__namespace.Clock();
       this._lastTime = this._clock.getElapsedTime();

@@ -118,7 +118,7 @@ export class App {
         /**
          * The input manager
          * @example
-         * this.inputs.actions = [
+         * app.inputs.map = [
          *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
          *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
          *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
@@ -126,7 +126,7 @@ export class App {
          *     { name: 'run', keys: ['ShiftLeft', 'ShiftRight']}
          * ]
          *
-         * this.onRender = (time, deltaTime) => {
+         * app.onRender = (time, deltaTime) => {
          *      if (app.inputs.isPressed('forward')) {
          *          // do something
          *      }
@@ -167,9 +167,8 @@ export class App {
                 })
         }
 
-        // Entities Manager
         // Instanciate Entity Manager
-        EntityManager.init( this.scene, this.world );
+        EntityManager.init( RENDER_ENGINE, PHYSICS_ENGINE, this.scene, this.world );
         this.sceneTree = EntityManager.getInstance();
 
         this._clock = new THREE.Clock();

@@ -31,7 +31,7 @@ export class App {
     /**
      * The input manager
      * @example
-     * this.inputs.actions = [
+     * app.inputs.map = [
      *     { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
      *     { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
      *     { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
@@ -39,7 +39,7 @@ export class App {
      *     { name: 'run', keys: ['ShiftLeft', 'ShiftRight']}
      * ]
      *
-     * this.onRender = (time, deltaTime) => {
+     * app.onRender = (time, deltaTime) => {
      *      if (app.inputs.isPressed('forward')) {
      *          // do something
      *      }
