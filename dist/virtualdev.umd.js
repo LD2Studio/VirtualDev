@@ -1391,7 +1391,7 @@
       this.rigidBodyDesc = rigidBodyDesc;
     }
   }
-  const version = "0.1.0";
+  const version = "0.2.0";
   let instance = null;
   let RENDER_ENGINE = null;
   let PHYSICS_ENGINE = null;

@@ -126,18 +126,22 @@ export class Entity {
 
     setGeometry(geometry) {
         this.geometry = geometry;
+        return this;
     }
 
     setMaterial(material) {
         this.material = material;
+        return this;
     }
 
     setCollider(colliderDesc) {
         this.colliderDesc = colliderDesc;
+        return this;
     }
 
     setRigidBody(rigidBodyDesc) {
         this.rigidBodyDesc = rigidBodyDesc;
+        return this;
     }
 }
 
