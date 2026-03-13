@@ -30,7 +30,7 @@ export class EntityManager {
         return entities;
     }
 
-    create( entity ) {
+    create( entity, position, rotation, scale ) {
         // console.log('create entity: ', entity);
         // console.log(entity.geometry instanceof THREE.BufferGeometry);
 
@@ -50,7 +50,33 @@ export class EntityManager {
             rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
             const collider = this.world.createCollider(entity.colliderDesc, rigidBody);
             rigidBody.setTranslation(entity.position);
+            rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
         }
+
+        const addEntity = (entity, meshParent) => {
+            console.log('add entity', entity, meshParent);
+            if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+                console.error('Geometry is not defined');
+                return;
+            }
+            const mesh = new THREE.Mesh(entity.geometry, entity.material);
+            mesh.position.copy(entity.position);
+            mesh.rotation.copy(entity.rotation);
+            mesh.scale.copy(entity.scale);
+            meshParent.add(mesh);
+
+            entity.children.forEach( (e) => {
+                console.log('add entity child', e)
+                addEntity(e, mesh);
+            })
+        }
+
+        entity.children.forEach( (e) => {
+            console.log('add entity child', e)
+            addEntity(e, mesh);
+        })
+
+        
 
         /**
          * @typedef {Object} EntityInstance
@@ -77,6 +103,13 @@ export class EntityManager {
                 if (this.rigidBody) {
                     this.rigidBody.setTranslation(pos);
                 }
+            },
+            set rotation(rot) {
+                mesh.rotation.copy(rot);
+                if (this.rigidBody) {
+                    const q = new THREE.Quaternion().setFromEuler(rot)
+                    this.rigidBody.setRotation(q);
+                }
             }
         }
 
@@ -87,7 +120,7 @@ export class EntityManager {
         return instance;
     }
 
-    remove( entity ) {
+    dispose( entity ) {
 
     }
 
@@ -122,6 +155,18 @@ export class Entity {
         this.material = new THREE.MeshBasicMaterial();
         this.colliderDesc = null;
         this.rigidBodyDesc = null;
+
+        this.children = [];
+    }
+
+    setPosition(position) {
+        this.position = position;
+        return this;
+    }
+
+    setRotation(rotation) {
+        this.rotation = rotation;
+        return this;
     }
 
     setGeometry(geometry) {
@@ -142,6 +187,10 @@ export class Entity {
     setRigidBody(rigidBodyDesc) {
         this.rigidBodyDesc = rigidBodyDesc;
         return this;
+    }
+
+    add(entity) {
+        this.children.push( entity );
     }
 }
 
