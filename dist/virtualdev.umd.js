@@ -1298,11 +1298,13 @@
   }
   const entities = [];
   let THREE;
+  let RAPIER;
   class EntityManager {
     constructor(render, physics2, scene, world) {
       this.scene = scene;
       this.world = world;
       THREE = render;
+      RAPIER = physics2;
     }
     static #instance = null;
     static init(render, physics2, scene, world) {
@@ -1319,7 +1321,7 @@
     get entities() {
       return entities;
     }
-    create(entity) {
+    create(entity, position, rotation, scale) {
       if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
         console.error("Geometry is not defined");
         return;
@@ -1333,7 +1335,42 @@
         rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
         this.world.createCollider(entity.colliderDesc, rigidBody);
         rigidBody.setTranslation(entity.position);
+        rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
       }
+      const addChild = (entityChild, meshParent, rigidBody2, parentMatrix) => {
+        if (entityChild.geometry === null || entityChild.geometry instanceof THREE.BufferGeometry === false) {
+          console.error("Geometry is not defined");
+          return;
+        }
+        const meshChild = new THREE.Mesh(entityChild.geometry, entityChild.material);
+        meshChild.position.copy(entityChild.position);
+        meshChild.rotation.copy(entityChild.rotation);
+        meshChild.scale.copy(entityChild.scale);
+        meshParent.add(meshChild);
+        const childMatrix = new THREE.Matrix4().compose(
+          entityChild.position,
+          new THREE.Quaternion().setFromEuler(entityChild.rotation),
+          entityChild.scale
+        );
+        const matrix = new THREE.Matrix4().multiplyMatrices(parentMatrix, childMatrix);
+        if (entityChild.colliderDesc) {
+          if (rigidBody2) {
+            const position2 = new THREE.Vector3();
+            const rotation2 = new THREE.Quaternion();
+            const scale2 = new THREE.Vector3();
+            matrix.decompose(position2, rotation2, scale2);
+            entityChild.colliderDesc.setTranslation(...position2);
+            entityChild.colliderDesc.setRotation(rotation2);
+            this.world.createCollider(entityChild.colliderDesc, rigidBody2);
+          }
+        }
+        entityChild.children.forEach((c) => {
+          addChild(c, meshChild, rigidBody2, matrix);
+        });
+      };
+      entity.children.forEach((c) => {
+        addChild(c, mesh, rigidBody, new THREE.Matrix4());
+      });
       const instance2 = {
         name: entity.name,
         position: entity.position,
@@ -1347,13 +1384,20 @@
           if (this.rigidBody) {
             this.rigidBody.setTranslation(pos);
           }
+        },
+        set rotation(rot) {
+          mesh.rotation.copy(rot);
+          if (this.rigidBody) {
+            const q = new THREE.Quaternion().setFromEuler(rot);
+            this.rigidBody.setRotation(q);
+          }
         }
       };
       this.scene.add(mesh);
       entities.push(instance2);
       return instance2;
     }
-    remove(entity) {
+    dispose(entity) {
     }
     update() {
       entities.forEach((obj) => {
@@ -1367,7 +1411,7 @@
     }
   }
   class Entity {
-    constructor(name) {
+    constructor(name = "") {
       this.name = name;
       this.uuid = crypto.randomUUID();
       this.position = new THREE.Vector3(0, 0, 0);
@@ -1377,18 +1421,56 @@
       this.material = new THREE.MeshBasicMaterial();
       this.colliderDesc = null;
       this.rigidBodyDesc = null;
+      this.children = [];
+    }
+    setPosition(position) {
+      this.position = position;
+      return this;
+    }
+    setRotation(rotation) {
+      this.rotation = rotation;
+      return this;
     }
     setGeometry(geometry) {
       this.geometry = geometry;
+      return this;
     }
     setMaterial(material) {
       this.material = material;
+      return this;
     }
     setCollider(colliderDesc) {
       this.colliderDesc = colliderDesc;
+      return this;
     }
     setRigidBody(rigidBodyDesc) {
       this.rigidBodyDesc = rigidBodyDesc;
+      return this;
+    }
+    add(entity, position = null, rotation = null) {
+      if (position !== null) {
+        entity.position = position;
+      }
+      if (rotation !== null) {
+        entity.rotation = rotation;
+      }
+      this.children.push(entity);
+    }
+    clone() {
+      const entityCloned = new Entity(this.name);
+      entityCloned.geometry = this.geometry.clone();
+      entityCloned.material = this.material.clone();
+      switch (this.colliderDesc.shape.type) {
+        case RAPIER.ShapeType.Cuboid:
+          const halfExtents = this.colliderDesc.shape.halfExtents;
+          entityCloned.colliderDesc = RAPIER.ColliderDesc.cuboid(
+            halfExtents.x,
+            halfExtents.y,
+            halfExtents.z
+          );
+          break;
+      }
+      return entityCloned;
     }
   }
   const version = "0.2.0";
@@ -1454,6 +1536,19 @@
           z: 0
         });
         console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`);
+        const ip = this.world.integrationParameters;
+        ip.contact_natural_frequency = 10;
+        ip.lengthUnit = 0.1;
+        this.colliderHelper = new THREE__namespace.LineSegments(
+          new THREE__namespace.BufferGeometry(),
+          new THREE__namespace.LineBasicMaterial({ color: 16777215, vertexColors: true })
+        );
+        this.scene.add(this.colliderHelper);
+        this.updateCollidersHelper = () => {
+          const { vertices, colors } = this.world.debugRender();
+          this.colliderHelper.geometry.setAttribute("position", new THREE__namespace.BufferAttribute(vertices, 3));
+          this.colliderHelper.geometry.setAttribute("color", new THREE__namespace.BufferAttribute(colors, 4));
+        };
       }
       this.inputs = new Input();
       if (interactive) {
@@ -1515,6 +1610,9 @@
             }
           }
           this.sceneTree.update();
+          if (interactive) {
+            this.updateCollidersHelper();
+          }
         }
         if (interactive) {
           this.orbitalControls.update();

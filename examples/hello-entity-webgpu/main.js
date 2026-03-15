@@ -1,15 +1,13 @@
 import * as THREE from 'three/webgpu';
-import * as VDEV from 'virtualdev';
+import { App, Entity } from 'virtualdev';
 
-const app = new VDEV.App(THREE, null, {
+const app = new App(THREE, null, {
     interactive: true,
 });
 
-const cubeMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshMatcapMaterial()
-);
+const cube = new Entity('Cube')
+    .setGeometry( new THREE.BoxGeometry() )
+    .setMaterial( new THREE.MeshMatcapMaterial({ color: 'red' }) )
+    .setPosition(new THREE.Vector3(0, 1, 0))
 
-const cube = new VDEV.Entity('Cube');
-cube.add(cubeMesh);
-app.sceneTree.add(cube);
+const cube_1 = app.sceneTree.create(cube);

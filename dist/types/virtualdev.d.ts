@@ -28,6 +28,8 @@ export class App {
      */
     camera: THREE.PerspectiveCamera;
     world: any;
+    colliderHelper: THREE.LineSegments<THREE.BufferGeometry<THREE.NormalBufferAttributes, THREE.BufferGeometryEventMap>, THREE.LineBasicMaterial, THREE.Object3DEventMap>;
+    updateCollidersHelper: () => void;
     /**
      * The input manager
      * @example

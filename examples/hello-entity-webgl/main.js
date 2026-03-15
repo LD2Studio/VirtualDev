@@ -1,15 +1,16 @@
 import * as THREE from 'three';
-import * as VDEV from 'virtualdev';
+import { App, Entity } from 'virtualdev';
 
-const app = new VDEV.App(THREE, null, {
+const app = new App(THREE, null, {
     interactive: true,
+    monitor: true,
 });
 
 
 // Create cube entity
-const cube = new VDEV.Entity('Cube');
-cube.setGeometry( new THREE.BoxGeometry() );
-cube.setMaterial( new THREE.MeshMatcapMaterial({ color: 'red' }) );
-cube.position = new THREE.Vector3(0, 2, 0);
+const cube = new Entity('Cube')
+    .setGeometry( new THREE.BoxGeometry() )
+    .setMaterial( new THREE.MeshMatcapMaterial({ color: 'red' }) )
+    .setPosition(new THREE.Vector3(0, 1, 0))
 
-app.sceneTree.create(cube);
+const cube_1 = app.sceneTree.create(cube);

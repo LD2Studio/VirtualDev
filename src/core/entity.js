@@ -32,7 +32,6 @@ export class EntityManager {
 
     create( entity, position, rotation, scale ) {
         // console.log('create entity: ', entity);
-        // console.log(entity.geometry instanceof THREE.BufferGeometry);
 
         if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
             console.error('Geometry is not defined');
@@ -46,37 +45,51 @@ export class EntityManager {
 
         let rigidBody = null;
         if (entity.rigidBodyDesc && entity.colliderDesc) {
-            // console.log('create rigid body');
             rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
             const collider = this.world.createCollider(entity.colliderDesc, rigidBody);
             rigidBody.setTranslation(entity.position);
             rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
         }
 
-        const addEntity = (entity, meshParent) => {
-            console.log('add entity', entity, meshParent);
-            if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+        const addChild = (entityChild, meshParent, rigidBody, parentMatrix) => {
+            if (entityChild.geometry === null || entityChild.geometry instanceof THREE.BufferGeometry === false) {
                 console.error('Geometry is not defined');
                 return;
             }
-            const mesh = new THREE.Mesh(entity.geometry, entity.material);
-            mesh.position.copy(entity.position);
-            mesh.rotation.copy(entity.rotation);
-            mesh.scale.copy(entity.scale);
-            meshParent.add(mesh);
+            
+            const meshChild = new THREE.Mesh(entityChild.geometry, entityChild.material);
+            meshChild.position.copy(entityChild.position);
+            meshChild.rotation.copy(entityChild.rotation);
+            meshChild.scale.copy(entityChild.scale);
+            meshParent.add(meshChild);
 
-            entity.children.forEach( (e) => {
-                console.log('add entity child', e)
-                addEntity(e, mesh);
+            const childMatrix = new THREE.Matrix4().compose(
+                entityChild.position,
+                new THREE.Quaternion().setFromEuler(entityChild.rotation),
+                entityChild.scale
+            );
+            const matrix = new THREE.Matrix4().multiplyMatrices(parentMatrix, childMatrix);
+            // console.log('matrix: ', matrix);
+
+            if (entityChild.colliderDesc) {
+                if (rigidBody) {
+                    const position = new THREE.Vector3();
+                    const rotation = new THREE.Quaternion();
+                    const scale = new THREE.Vector3();
+                    matrix.decompose(position, rotation, scale);
+                    entityChild.colliderDesc.setTranslation(...position);
+                    entityChild.colliderDesc.setRotation(rotation);
+                    const collider = this.world.createCollider(entityChild.colliderDesc, rigidBody); 
+                }
+            }
+            entityChild.children.forEach( (c) => {
+                addChild(c, meshChild, rigidBody, matrix);
             })
         }
 
-        entity.children.forEach( (e) => {
-            console.log('add entity child', e)
-            addEntity(e, mesh);
+        entity.children.forEach( (c) => {
+            addChild(c, mesh, rigidBody, new THREE.Matrix4());
         })
-
-        
 
         /**
          * @typedef {Object} EntityInstance
@@ -143,8 +156,7 @@ export class EntityManager {
  */
 
 export class Entity {
-    constructor( name ) {
-        // console.log(`Create ${name}`);
+    constructor( name = '' ) {
         this.name = name;
         this.uuid = crypto.randomUUID();
         this.position = new THREE.Vector3(0, 0, 0);
@@ -189,8 +201,29 @@ export class Entity {
         return this;
     }
 
-    add(entity) {
+    add(entity, position = null, rotation = null) {
+        if (position !== null) {
+            entity.position = position;
+        }
+        if (rotation !== null) {
+            entity.rotation = rotation;
+        }
         this.children.push( entity );
+    }
+
+    clone() {
+        const entityCloned = new Entity( this.name );
+        entityCloned.geometry = this.geometry.clone();
+        entityCloned.material = this.material.clone();
+        switch (this.colliderDesc.shape.type) {
+            case RAPIER.ShapeType.Cuboid:
+                const halfExtents = this.colliderDesc.shape.halfExtents
+                entityCloned.colliderDesc = RAPIER.ColliderDesc.cuboid(
+                    halfExtents.x, halfExtents.y, halfExtents.z
+                );
+                break;
+        }
+        return entityCloned;
     }
 }
 

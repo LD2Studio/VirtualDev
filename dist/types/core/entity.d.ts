@@ -6,7 +6,7 @@ export class EntityManager {
     scene: any;
     world: any;
     get entities(): any[];
-    create(entity: any): {
+    create(entity: any, position: any, rotation: any, scale: any): {
         /**
          * - A name for the entity
          */
@@ -24,14 +24,14 @@ export class EntityManager {
          */
         scale?: THREE.Vector3;
     };
-    remove(entity: any): void;
+    dispose(entity: any): void;
     update(): void;
 }
 /**
  * @type {Entity}
  */
 export class Entity {
-    constructor(name: any);
+    constructor(name?: string);
     name: any;
     uuid: any;
     position: any;
@@ -41,9 +41,14 @@ export class Entity {
     material: any;
     colliderDesc: any;
     rigidBodyDesc: any;
-    setGeometry(geometry: any): void;
-    setMaterial(material: any): void;
-    setCollider(colliderDesc: any): void;
-    setRigidBody(rigidBodyDesc: any): void;
+    children: any;
+    setPosition(position: any): this;
+    setRotation(rotation: any): this;
+    setGeometry(geometry: any): this;
+    setMaterial(material: any): this;
+    setCollider(colliderDesc: any): this;
+    setRigidBody(rigidBodyDesc: any): this;
+    add(entity: any, position?: any, rotation?: any): void;
+    clone(): Entity;
 }
 //# sourceMappingURL=entity.d.ts.map

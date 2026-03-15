@@ -112,7 +112,26 @@ export class App {
                 x: 0, y: -9.81, z: 0
             });
 
-            console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`)
+            console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`);
+
+            const ip = this.world.integrationParameters;
+            // console.log(ip);
+            ip.contact_natural_frequency = 10;
+            ip.lengthUnit = 0.1;
+
+            // Colliders Helper
+            this.colliderHelper = new THREE.LineSegments(
+                new THREE.BufferGeometry(),
+                new THREE.LineBasicMaterial({ color: 0xffffff, vertexColors: true, })
+            );
+            // colliderHelper.frustumCulled = false;
+            this.scene.add(this.colliderHelper);
+
+            this.updateCollidersHelper = () => {
+                const { vertices, colors } = this.world.debugRender();
+                this.colliderHelper.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                this.colliderHelper.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 4));
+            }
         }
 
         /**
@@ -213,6 +232,9 @@ export class App {
                     }
                 }
                 this.sceneTree.update();
+                if (interactive) {
+                    this.updateCollidersHelper();
+                }
             }
 
             if (interactive) {

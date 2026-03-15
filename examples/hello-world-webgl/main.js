@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as VDEV from 'virtualdev';
+import { App } from 'virtualdev';
 
-const app = new VDEV.App(THREE, null, {
+const app = new App(THREE, null, {
     name: 'VirtualDev - Hello WebGL',
     interactive: true,
 });
