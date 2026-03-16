@@ -7,3 +7,4 @@ tests/
 roadmap/
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/deploy.sh

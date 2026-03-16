@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "VirtualDev Docs"
-  text: "Framework VirtualDev"
+  name: "Framework VirtualDev"
+  text: "Documentation"
   actions:
     - theme: brand
       text: Prise en main
@@ -13,12 +13,12 @@ hero:
       text: Exemples
       link: /examples/
 
-features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+# features:
+#   - title: Feature A
+#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+#   - title: Feature B
+#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+#   - title: Feature C
+#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
 

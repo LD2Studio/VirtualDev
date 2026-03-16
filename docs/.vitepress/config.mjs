@@ -16,7 +16,8 @@ export default defineConfig({
         text: 'Prise en main',
         items: [
           { text: 'Qu\'est-ce que VirtualDev ?', link: '/getting-started/about' },
-          { text: 'Installation', link: '/getting-started/install' }
+          { text: 'Créer un nouveau projet', link: '/getting-started/create-project' },
+          { text: 'Créer une application simple avec VirtualDev', link: '/getting-started/create-simple-app' },
         ]
       },
       {
@@ -30,7 +31,8 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/LD2Studio/VirtualDev' }
     ]
-  }
+  },
+  ignoreDeadLinks: 'localhostLinks'
 })
