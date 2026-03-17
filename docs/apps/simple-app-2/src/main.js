@@ -1,0 +1,13 @@
+import * as THREE from 'three' // Importe la bibliothèque Three.js
+import { App } from 'virtualdev' // Importe la classe App
+
+const app = new App(THREE) // Crée une nouvelle application
+// qui affiche une scène 3D dans le navigateur
+
+const sphere = new THREE.Mesh(  // crée un maillage 3D
+    new THREE.SphereGeometry(), // crée une géométrie sphérique
+    new THREE.MeshMatcapMaterial()  // applique un matériau
+)
+
+app.scene.add(sphere) // ajoute la sphère à la scène
+

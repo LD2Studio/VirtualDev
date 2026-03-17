@@ -4,6 +4,16 @@
 
 Pour pouvoir créer un projet VirtualDev, vous devez avoir la commande `npm` disponible dans une console (ou un terminal). Celle-ci est disponible en installant [Node.js](https://nodejs.org/fr/download) sur votre machine.
 
+De plus, l'outil [git](https://git-scm.com/download) est nécessaire aussi.
+
+::: warning  Avertissement aux utilisateurs de machine sous Windows
+Pour les utilisateurs de machine sous Windows, il faut exécuter la commande suivante dans une console pour autoriser l'exécution de scripts shell.
+
+```bash
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+:::
+
 ## Créer un nouveau projet VirtualDev
 
 1. Créer un dossier dans lequel le projet sera créé.
