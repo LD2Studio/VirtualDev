@@ -11,6 +11,9 @@ const app = new App(THREE, null, {
 const cube = new Entity('Cube')
     .setGeometry( new THREE.BoxGeometry() )
     .setMaterial( new THREE.MeshMatcapMaterial({ color: 'red' }) )
-    .setPosition(new THREE.Vector3(0, 1, 0))
 
 const cube_1 = app.sceneTree.create(cube);
+cube_1.position = new THREE.Vector3(1, 1, 0);
+
+const cube_2 = app.sceneTree.create(cube);
+cube_2.position = new THREE.Vector3(-1, 1, 0);

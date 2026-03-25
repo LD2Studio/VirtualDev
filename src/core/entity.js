@@ -3,6 +3,9 @@ const entities = [];
 let THREE;
 let RAPIER;
 
+/**
+ * Entity manager
+ */
 export class EntityManager {
     constructor( render, physics, scene, world ) {
         this.scene = scene;
@@ -30,21 +33,32 @@ export class EntityManager {
         return entities;
     }
 
+    /**
+     * Create an instance of an entity in the world
+     * @param {*} entity 
+     * @param {*} position 
+     * @param {*} rotation 
+     * @param {*} scale 
+     * @returns 
+     */
     create( entity, position, rotation, scale ) {
         // console.log('create entity: ', entity);
 
-        if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+        if (entity.mesh === null && (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false)) {
             console.error('Geometry is not defined');
             return;
         }
-        const mesh = new THREE.Mesh(entity.geometry, entity.material);
+        const mesh = entity.mesh instanceof THREE.Mesh ? entity.mesh.clone() : new THREE.Mesh(entity.geometry, entity.material);
 
         mesh.position.copy(entity.position);
         mesh.rotation.copy(entity.rotation);
         mesh.scale.copy(entity.scale);
 
         let rigidBody = null;
-        if (entity.rigidBodyDesc && entity.colliderDesc) {
+        if (entity.colliderDesc) {
+            if (entity.rigidBodyDesc === null) {
+                entity.rigidBodyDesc = RAPIER.RigidBodyDesc.fixed();
+            }
             rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
             const collider = this.world.createCollider(entity.colliderDesc, rigidBody);
             rigidBody.setTranslation(entity.position);
@@ -111,13 +125,38 @@ export class EntityManager {
             uuid: crypto.randomUUID(),
             mesh: mesh,
             rigidBody: rigidBody,
-            set position(pos) {
+            setPosition: (x,y,z) => {
+                let position;
+                if (x instanceof THREE.Vector3) {
+                    position = x;
+                }
+                else {
+                    position = new THREE.Vector3(x,y,z);
+                }
+                mesh.position.copy(position);
+                if (rigidBody) rigidBody.setTranslation(position);
+            },
+            set position(pos) { // Deprecated
                 mesh.position.copy(pos);
                 if (this.rigidBody) {
                     this.rigidBody.setTranslation(pos);
                 }
             },
-            set rotation(rot) {
+            setRotation: (x,y,z) => {
+                let rotation;
+                if (x instanceof THREE.Euler) {
+                    rotation = x;
+                }
+                else {
+                    rotation = new THREE.Euler(x,y,z);
+                }
+                mesh.rotation.copy(rotation);
+                if (rigidBody) {
+                    const q = new THREE.Quaternion().setFromEuler(rotation);
+                    rigidBody.setRotation(q);
+                }
+            },
+            set rotation(rot) { // Deprecated
                 mesh.rotation.copy(rot);
                 if (this.rigidBody) {
                     const q = new THREE.Quaternion().setFromEuler(rot)
@@ -152,7 +191,7 @@ export class EntityManager {
 }
 
 /**
- * @type {Entity}
+ * Class to create an entity
  */
 
 export class Entity {
@@ -162,7 +201,7 @@ export class Entity {
         this.position = new THREE.Vector3(0, 0, 0);
         this.rotation = new THREE.Euler(0, 0, 0);
         this.scale = new THREE.Vector3(1, 1, 1);
-
+        this.mesh = null;
         this.geometry = null;
         this.material = new THREE.MeshBasicMaterial();
         this.colliderDesc = null;
@@ -178,6 +217,11 @@ export class Entity {
 
     setRotation(rotation) {
         this.rotation = rotation;
+        return this;
+    }
+
+    setMesh(mesh) {
+        this.mesh = mesh;
         return this;
     }
 
@@ -202,25 +246,42 @@ export class Entity {
     }
 
     add(entity, position = null, rotation = null) {
+        // console.log('Add child entity: ', entity);
+        const addedEntity = entity.clone();
         if (position !== null) {
-            entity.position = position;
+            addedEntity.position = position;
         }
         if (rotation !== null) {
-            entity.rotation = rotation;
+            addedEntity.rotation = rotation;
         }
-        this.children.push( entity );
+        this.children.push( addedEntity );
+
+        return addedEntity;
     }
 
     clone() {
         const entityCloned = new Entity( this.name );
+        entityCloned.position = this.position.clone();
+        entityCloned.rotation = this.rotation.clone();
         entityCloned.geometry = this.geometry.clone();
         entityCloned.material = this.material.clone();
         switch (this.colliderDesc.shape.type) {
             case RAPIER.ShapeType.Cuboid:
-                const halfExtents = this.colliderDesc.shape.halfExtents
+                const halfExtents = this.colliderDesc.shape.halfExtents;
                 entityCloned.colliderDesc = RAPIER.ColliderDesc.cuboid(
                     halfExtents.x, halfExtents.y, halfExtents.z
                 );
+                break;
+            case RAPIER.ShapeType.Ball:
+                entityCloned.colliderDesc = RAPIER.ColliderDesc.ball(this.colliderDesc.shape.radius);
+                break;
+            case RAPIER.ShapeType.Cylinder:
+                const shape = this.colliderDesc.shape
+                entityCloned.colliderDesc = RAPIER.ColliderDesc.cylinder(
+                    shape.halfHeight, shape.radius
+                );
+                break;
+            default:
                 break;
         }
         return entityCloned;

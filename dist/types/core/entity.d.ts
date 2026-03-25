@@ -1,3 +1,6 @@
+/**
+ * Entity manager
+ */
 export class EntityManager {
     static "__#private@#instance": any;
     static init(render: any, physics: any, scene: any, world: any): void;
@@ -6,6 +9,14 @@ export class EntityManager {
     scene: any;
     world: any;
     get entities(): any[];
+    /**
+     * Create an instance of an entity in the world
+     * @param {*} entity
+     * @param {*} position
+     * @param {*} rotation
+     * @param {*} scale
+     * @returns
+     */
     create(entity: any, position: any, rotation: any, scale: any): {
         /**
          * - A name for the entity
@@ -28,27 +39,29 @@ export class EntityManager {
     update(): void;
 }
 /**
- * @type {Entity}
+ * Class to create an entity
  */
 export class Entity {
     constructor(name?: string);
-    name: any;
-    uuid: any;
+    name: string;
+    uuid: `${string}-${string}-${string}-${string}-${string}`;
     position: any;
     rotation: any;
     scale: any;
+    mesh: any;
     geometry: any;
     material: any;
     colliderDesc: any;
     rigidBodyDesc: any;
-    children: any;
+    children: any[];
     setPosition(position: any): this;
     setRotation(rotation: any): this;
+    setMesh(mesh: any): this;
     setGeometry(geometry: any): this;
     setMaterial(material: any): this;
     setCollider(colliderDesc: any): this;
     setRigidBody(rigidBodyDesc: any): this;
-    add(entity: any, position?: any, rotation?: any): void;
+    add(entity: any, position?: any, rotation?: any): any;
     clone(): Entity;
 }
 //# sourceMappingURL=entity.d.ts.map

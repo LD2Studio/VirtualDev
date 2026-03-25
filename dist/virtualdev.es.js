@@ -1303,17 +1303,28 @@ class EntityManager {
   get entities() {
     return entities;
   }
+  /**
+   * Create an instance of an entity in the world
+   * @param {*} entity 
+   * @param {*} position 
+   * @param {*} rotation 
+   * @param {*} scale 
+   * @returns 
+   */
   create(entity, position, rotation, scale) {
-    if (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false) {
+    if (entity.mesh === null && (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false)) {
       console.error("Geometry is not defined");
       return;
     }
-    const mesh = new THREE.Mesh(entity.geometry, entity.material);
+    const mesh = entity.mesh instanceof THREE.Mesh ? entity.mesh.clone() : new THREE.Mesh(entity.geometry, entity.material);
     mesh.position.copy(entity.position);
     mesh.rotation.copy(entity.rotation);
     mesh.scale.copy(entity.scale);
     let rigidBody = null;
-    if (entity.rigidBodyDesc && entity.colliderDesc) {
+    if (entity.colliderDesc) {
+      if (entity.rigidBodyDesc === null) {
+        entity.rigidBodyDesc = RAPIER.RigidBodyDesc.fixed();
+      }
       rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
       this.world.createCollider(entity.colliderDesc, rigidBody);
       rigidBody.setTranslation(entity.position);
@@ -1361,10 +1372,33 @@ class EntityManager {
       uuid: crypto.randomUUID(),
       mesh,
       rigidBody,
+      setPosition: (x, y, z) => {
+        let position2;
+        if (x instanceof THREE.Vector3) {
+          position2 = x;
+        } else {
+          position2 = new THREE.Vector3(x, y, z);
+        }
+        mesh.position.copy(position2);
+        if (rigidBody) rigidBody.setTranslation(position2);
+      },
       set position(pos) {
         mesh.position.copy(pos);
         if (this.rigidBody) {
           this.rigidBody.setTranslation(pos);
+        }
+      },
+      setRotation: (x, y, z) => {
+        let rotation2;
+        if (x instanceof THREE.Euler) {
+          rotation2 = x;
+        } else {
+          rotation2 = new THREE.Euler(x, y, z);
+        }
+        mesh.rotation.copy(rotation2);
+        if (rigidBody) {
+          const q = new THREE.Quaternion().setFromEuler(rotation2);
+          rigidBody.setRotation(q);
         }
       },
       set rotation(rot) {
@@ -1399,6 +1433,7 @@ class Entity {
     this.position = new THREE.Vector3(0, 0, 0);
     this.rotation = new THREE.Euler(0, 0, 0);
     this.scale = new THREE.Vector3(1, 1, 1);
+    this.mesh = null;
     this.geometry = null;
     this.material = new THREE.MeshBasicMaterial();
     this.colliderDesc = null;
@@ -1411,6 +1446,10 @@ class Entity {
   }
   setRotation(rotation) {
     this.rotation = rotation;
+    return this;
+  }
+  setMesh(mesh) {
+    this.mesh = mesh;
     return this;
   }
   setGeometry(geometry) {
@@ -1430,16 +1469,20 @@ class Entity {
     return this;
   }
   add(entity, position = null, rotation = null) {
+    const addedEntity = entity.clone();
     if (position !== null) {
-      entity.position = position;
+      addedEntity.position = position;
     }
     if (rotation !== null) {
-      entity.rotation = rotation;
+      addedEntity.rotation = rotation;
     }
-    this.children.push(entity);
+    this.children.push(addedEntity);
+    return addedEntity;
   }
   clone() {
     const entityCloned = new Entity(this.name);
+    entityCloned.position = this.position.clone();
+    entityCloned.rotation = this.rotation.clone();
     entityCloned.geometry = this.geometry.clone();
     entityCloned.material = this.material.clone();
     switch (this.colliderDesc.shape.type) {
@@ -1451,11 +1494,21 @@ class Entity {
           halfExtents.z
         );
         break;
+      case RAPIER.ShapeType.Ball:
+        entityCloned.colliderDesc = RAPIER.ColliderDesc.ball(this.colliderDesc.shape.radius);
+        break;
+      case RAPIER.ShapeType.Cylinder:
+        const shape = this.colliderDesc.shape;
+        entityCloned.colliderDesc = RAPIER.ColliderDesc.cylinder(
+          shape.halfHeight,
+          shape.radius
+        );
+        break;
     }
     return entityCloned;
   }
 }
-const version = "0.2.0";
+const version = "0.2.1";
 let instance = null;
 let RENDER_ENGINE = null;
 let PHYSICS_ENGINE = null;
