@@ -55,12 +55,12 @@ export class App {
         msPanel: any;
         gpuPanel: any;
         gpuPanelCompute: any;
-        vsyncPanel: import("./extras/stats-gl/panelVsync").PanelVSync;
-        workerCpuPanel: import("./extras/stats-gl/panel").Panel;
+        vsyncPanel: import("./extras/stats-gl/panelVsync.js").PanelVSync;
+        workerCpuPanel: import("./extras/stats-gl/panel.js").Panel;
         texturePanels: Map<any, any>;
         texturePanelRow: HTMLDivElement;
-        textureCaptureWebGL: import("./extras/stats-gl/textureCapture").TextureCaptureWebGL;
-        textureCaptureWebGPU: import("./extras/stats-gl/textureCapture").TextureCaptureWebGPU;
+        textureCaptureWebGL: import("./extras/stats-gl/textureCapture.js").TextureCaptureWebGL;
+        textureCaptureWebGPU: import("./extras/stats-gl/textureCapture.js").TextureCaptureWebGPU;
         textureSourcesWebGL: Map<any, any>;
         textureSourcesWebGPU: Map<any, any>;
         texturePreviewWidth: number;
@@ -117,7 +117,7 @@ export class App {
         resizePanel(panel: any): void;
         addPanel(panel: any): any;
         showPanel(id: any): void;
-        addTexturePanel(name: any): import("./extras/stats-gl/panelTexture").PanelTexture;
+        addTexturePanel(name: any): import("./extras/stats-gl/panelTexture.js").PanelTexture;
         setTexture(name: any, source: any): void;
         setTextureWebGL(name: any, framebuffer: any, width: any, height: any): void;
         setTextureBitmap(name: any, bitmap: any, sourceWidth: any, sourceHeight: any): void;
@@ -243,7 +243,7 @@ export type AppOptions = {
      */
     renderOptions?: THREE.WebGLRenderer.Options;
 };
-import { Entity } from './core/entity';
+import { Entity } from './core/entity.js';
 import * as THREE from 'three';
-import { Outliner } from './ui/outliner';
+import { Outliner } from './ui/outliner.js';
 //# sourceMappingURL=virtualdev.d.ts.map

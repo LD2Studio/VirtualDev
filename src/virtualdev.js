@@ -3,11 +3,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { XRButton } from 'three/addons/webxr/XRButton.js';
 
-import { Input } from './core/inputs';
-import { Outliner } from './ui/outliner';
-import { EntityManager, Entity } from './core/entity';
+import { Input } from './core/inputs.js';
+import { Outliner } from './ui/outliner.js';
+import { EntityManager, Entity } from './core/entity.js';
 
-import { version } from '../package.json';
+import { version } from './version.js';
 
 export { Entity };
 
