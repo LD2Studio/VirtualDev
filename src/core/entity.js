@@ -142,6 +142,9 @@ export class EntityManager {
                     this.rigidBody.setTranslation(pos);
                 }
             },
+            get position() {
+                return mesh.position;
+            },
             setRotation: (x,y,z) => {
                 let rotation;
                 if (x instanceof THREE.Euler) {
@@ -174,6 +177,43 @@ export class EntityManager {
 
     dispose( entity ) {
 
+    }
+
+    attach(entity1, entity2, jointParameters = {}) {
+        const {
+            jointType = 'fixed',
+            jointPosition = null,
+        } = jointParameters;
+
+        let jointInstance = null;
+        if (jointType === 'fixed') {
+            let jointPositionComputed;
+            // console.log('Fixed joint', entity1, entity2);
+            if (jointPosition === null) {
+                jointPositionComputed = new THREE.Vector3(0, 0, 0);
+                jointPositionComputed.addVectors(entity1.mesh.position, entity2.mesh.position).multiplyScalar(0.5);
+            }
+            else {
+                jointPositionComputed = jointPosition;
+            }
+            const anchor1 = entity1.mesh.clone().worldToLocal( jointPositionComputed.clone() );
+            const anchor2 = entity2.mesh.clone().worldToLocal( jointPositionComputed.clone() );
+            const jointDesc = RAPIER.JointData.fixed(
+                anchor1,
+                entity1.mesh.clone().quaternion.conjugate(),
+                anchor2,
+                entity2.mesh.clone().quaternion.conjugate()
+            );
+            jointInstance = this.world.createImpulseJoint(
+                jointDesc,
+                entity1.rigidBody,
+                entity2.rigidBody,
+                true
+            )
+
+            // console.log(jointInstance instanceof RAPIER.FixedImpulseJoint);
+        }
+        return jointInstance;
     }
 
     update() {
@@ -287,4 +327,3 @@ export class Entity {
         return entityCloned;
     }
 }
-
