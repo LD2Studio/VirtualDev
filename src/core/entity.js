@@ -41,7 +41,7 @@ export class EntityManager {
      * @param {*} scale 
      * @returns 
      */
-    create( entity, position, rotation, scale ) {
+    create( entity ) {
         // console.log('create entity: ', entity);
 
         if (entity.mesh === null && (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false)) {
@@ -183,6 +183,7 @@ export class EntityManager {
         const {
             jointType = 'fixed',
             jointPosition = null,
+            jointAxe = null,
         } = jointParameters;
 
         let jointInstance = null;
@@ -215,7 +216,7 @@ export class EntityManager {
         }
         else if (jointType === 'revolute') {
             let jointPositionComputed;
-            // console.log('Fixed joint', entity1, entity2);
+            // console.log('Revolute joint', entity1, entity2);
             if (jointPosition === null) {
                 jointPositionComputed = new THREE.Vector3(0, 0, 0);
                 jointPositionComputed.addVectors(entity1.mesh.position, entity2.mesh.position).multiplyScalar(0.5);
@@ -223,13 +224,14 @@ export class EntityManager {
             else {
                 jointPositionComputed = jointPosition;
             }
+            const jointAxeComputed = jointAxe === null ? new THREE.Vector3(1, 0, 0) : jointAxe;
             const anchor1 = entity1.mesh.clone().worldToLocal( jointPositionComputed.clone() );
             const anchor2 = entity2.mesh.clone().worldToLocal( jointPositionComputed.clone() );
-            const revoluteAxe = new THREE.Vector3(1,0,0);
+
             const jointDesc = RAPIER.JointData.revolute(
                 anchor1,
                 anchor2,
-                revoluteAxe
+                jointAxeComputed
             );
             jointInstance = this.world.createImpulseJoint(
                 jointDesc,
