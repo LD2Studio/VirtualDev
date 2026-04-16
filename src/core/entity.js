@@ -209,9 +209,34 @@ export class EntityManager {
                 entity1.rigidBody,
                 entity2.rigidBody,
                 true
-            )
+            );
 
             // console.log(jointInstance instanceof RAPIER.FixedImpulseJoint);
+        }
+        else if (jointType === 'revolute') {
+            let jointPositionComputed;
+            // console.log('Fixed joint', entity1, entity2);
+            if (jointPosition === null) {
+                jointPositionComputed = new THREE.Vector3(0, 0, 0);
+                jointPositionComputed.addVectors(entity1.mesh.position, entity2.mesh.position).multiplyScalar(0.5);
+            }
+            else {
+                jointPositionComputed = jointPosition;
+            }
+            const anchor1 = entity1.mesh.clone().worldToLocal( jointPositionComputed.clone() );
+            const anchor2 = entity2.mesh.clone().worldToLocal( jointPositionComputed.clone() );
+            const revoluteAxe = new THREE.Vector3(1,0,0);
+            const jointDesc = RAPIER.JointData.revolute(
+                anchor1,
+                anchor2,
+                revoluteAxe
+            );
+            jointInstance = this.world.createImpulseJoint(
+                jointDesc,
+                entity1.rigidBody,
+                entity2.rigidBody,
+                true
+            );
         }
         return jointInstance;
     }
@@ -265,8 +290,10 @@ export class Entity {
         return this;
     }
 
-    setGeometry(geometry) {
-        this.geometry = geometry;
+    setGeometry(geometry, offset = new THREE.Vector3(0, 0, 0), rotation = new THREE.Euler(0, 0, 0)) {
+        this.geometry = geometry.clone()
+            .applyQuaternion(new THREE.Quaternion().setFromEuler(rotation))
+            .translate(offset.x, offset.y, offset.z)
         return this;
     }
 
@@ -275,8 +302,10 @@ export class Entity {
         return this;
     }
 
-    setCollider(colliderDesc) {
-        this.colliderDesc = colliderDesc;
+    setCollider(colliderDesc, offset = new THREE.Vector3(0, 0, 0), rotation = new THREE.Euler(0, 0, 0)) {
+        this.colliderDesc = colliderDesc
+            .setTranslation(offset.x, offset.y, offset.z)
+            .setRotation(new THREE.Quaternion().setFromEuler(rotation));
         return this;
     }
 
