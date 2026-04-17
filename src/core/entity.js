@@ -44,15 +44,24 @@ export class EntityManager {
     create( entity ) {
         // console.log('create entity: ', entity);
 
+        let mesh;
         if (entity.mesh === null && (entity.geometry === null || entity.geometry instanceof THREE.BufferGeometry === false)) {
-            console.error('Geometry is not defined');
-            return;
+            console.warn('Geometry is not defined');
+            mesh = new THREE.Object3D();
         }
-        const mesh = entity.mesh instanceof THREE.Mesh ? entity.mesh.clone() : new THREE.Mesh(entity.geometry, entity.material);
-
-        mesh.position.copy(entity.position);
-        mesh.rotation.copy(entity.rotation);
-        mesh.scale.copy(entity.scale);
+        else {
+            if( entity.mesh instanceof THREE.Mesh ) {
+                mesh = entity.mesh.clone();
+            }
+            else {
+                mesh = new THREE.Mesh(
+                    entity.geometry,
+                    entity.material);
+            }
+            // mesh.position.copy(entity.position);
+            // mesh.rotation.copy(entity.rotation);
+            // mesh.scale.copy(entity.scale);
+        }
 
         let rigidBody = null;
         if (entity.colliderDesc) {
@@ -60,7 +69,7 @@ export class EntityManager {
                 entity.rigidBodyDesc = RAPIER.RigidBodyDesc.fixed();
             }
             rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
-            const collider = this.world.createCollider(entity.colliderDesc, rigidBody);
+            this.world.createCollider(entity.colliderDesc, rigidBody);
             rigidBody.setTranslation(entity.position);
             rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
         }
@@ -70,7 +79,7 @@ export class EntityManager {
                 console.error('Geometry is not defined');
                 return;
             }
-            
+
             const meshChild = new THREE.Mesh(entityChild.geometry, entityChild.material);
             meshChild.position.copy(entityChild.position);
             meshChild.rotation.copy(entityChild.rotation);
@@ -133,7 +142,7 @@ export class EntityManager {
                 else {
                     position = new THREE.Vector3(x,y,z);
                 }
-                mesh.position.copy(position);
+                if (mesh) mesh.position.copy(position);
                 if (rigidBody) rigidBody.setTranslation(position);
             },
             set position(pos) { // Deprecated
@@ -186,13 +195,13 @@ export class EntityManager {
             jointAxe = null,
         } = jointParameters;
 
-        let jointInstance = null;
+        let impulseJoint = null;
         if (jointType === 'fixed') {
             let jointPositionComputed;
             // console.log('Fixed joint', entity1, entity2);
             if (jointPosition === null) {
                 jointPositionComputed = new THREE.Vector3(0, 0, 0);
-                jointPositionComputed.addVectors(entity1.mesh.position, entity2.mesh.position).multiplyScalar(0.5);
+                jointPositionComputed.addVectors(entity1.position, entity2.position).multiplyScalar(0.5);
             }
             else {
                 jointPositionComputed = jointPosition;
@@ -205,14 +214,14 @@ export class EntityManager {
                 anchor2,
                 entity2.mesh.clone().quaternion.conjugate()
             );
-            jointInstance = this.world.createImpulseJoint(
+            impulseJoint = this.world.createImpulseJoint(
                 jointDesc,
                 entity1.rigidBody,
                 entity2.rigidBody,
                 true
             );
 
-            // console.log(jointInstance instanceof RAPIER.FixedImpulseJoint);
+            // console.log(impulseJoint instanceof RAPIER.FixedImpulseJoint);
         }
         else if (jointType === 'revolute') {
             let jointPositionComputed;
@@ -233,27 +242,53 @@ export class EntityManager {
                 anchor2,
                 jointAxeComputed
             );
-            jointInstance = this.world.createImpulseJoint(
+            impulseJoint = this.world.createImpulseJoint(
                 jointDesc,
                 entity1.rigidBody,
                 entity2.rigidBody,
                 true
             );
         }
-        return jointInstance;
+        const instance = {
+            impulseJoint,
+        /**
+         * Sets the motor velocity for the impulse joint
+         * @param {number} velocity - The motor velocity (radians per second)
+         * @param {number} [factor=0] - The factor to apply to the motor velocity (0 = infinite force)
+         */
+            setMotorVelocity(velocity, factor = 0) {
+                impulseJoint.configureMotorVelocity(velocity, factor);
+            },
+            _targetVelocity: 0,
+            set targetVelocity(vel) {
+                this._targetVelocity = vel;
+                impulseJoint.configureMotorVelocity(vel, 0);
+            },
+            get targetVelocity() {
+                // const vel1 = impulseJoint.body2().angvel();
+                // return vel1.z;
+                return this._targetVelocity;
+            },
+            setMotorPosition(targetPos, stiffness = 100, damping = 1) {
+                impulseJoint.configureMotorPosition(targetPos, stiffness, damping);
+            }
+        }
+        return instance;
     }
 
     update() {
         entities.forEach( obj => {
-            if (obj.rigidBody) {
-                // console.log(obj.rigidBody);
+            if (obj.rigidBody && obj.mesh) {
                 if (obj.rigidBody.isDynamic()) {
-                    // console.log('Obj is dynamic');
                     obj.mesh.position.copy(obj.rigidBody.translation());
                     obj.mesh.quaternion.copy(obj.rigidBody.rotation());
                 }
             }
         });
+    }
+
+    createModel( model, initialPosition = new THREE.Vector3(0, 0, 0) ) {
+        return model.build(this, initialPosition);
     }
 }
 
@@ -336,24 +371,29 @@ export class Entity {
         entityCloned.rotation = this.rotation.clone();
         entityCloned.geometry = this.geometry.clone();
         entityCloned.material = this.material.clone();
-        switch (this.colliderDesc.shape.type) {
-            case RAPIER.ShapeType.Cuboid:
-                const halfExtents = this.colliderDesc.shape.halfExtents;
-                entityCloned.colliderDesc = RAPIER.ColliderDesc.cuboid(
-                    halfExtents.x, halfExtents.y, halfExtents.z
-                );
-                break;
-            case RAPIER.ShapeType.Ball:
-                entityCloned.colliderDesc = RAPIER.ColliderDesc.ball(this.colliderDesc.shape.radius);
-                break;
-            case RAPIER.ShapeType.Cylinder:
-                const shape = this.colliderDesc.shape
-                entityCloned.colliderDesc = RAPIER.ColliderDesc.cylinder(
-                    shape.halfHeight, shape.radius
-                );
-                break;
-            default:
-                break;
+        if (this.colliderDesc) {
+            switch (this.colliderDesc.shape.type) {
+                case RAPIER.ShapeType.Cuboid:
+                    const halfExtents = this.colliderDesc.shape.halfExtents;
+                    entityCloned.colliderDesc = RAPIER.ColliderDesc.cuboid(
+                        halfExtents.x, halfExtents.y, halfExtents.z
+                    );
+                    break;
+                case RAPIER.ShapeType.Ball:
+                    entityCloned.colliderDesc = RAPIER.ColliderDesc.ball(this.colliderDesc.shape.radius);
+                    break;
+                case RAPIER.ShapeType.Cylinder:
+                    const shape = this.colliderDesc.shape
+                    entityCloned.colliderDesc = RAPIER.ColliderDesc.cylinder(
+                        shape.halfHeight, shape.radius
+                    );
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            entityCloned.colliderDesc = null;
         }
         return entityCloned;
     }

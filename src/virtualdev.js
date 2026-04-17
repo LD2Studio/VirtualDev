@@ -3,13 +3,15 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { XRButton } from 'three/addons/webxr/XRButton.js';
 
+import RAPIER from '@dimforge/rapier3d-compat';
+
 import { Input } from './core/inputs.js';
 import { Outliner } from './ui/outliner.js';
 import { EntityManager, Entity } from './core/entity.js';
 
 import { version } from './version.js';
 
-export { Entity };
+export { Entity, THREE, RAPIER };
 
 /**
  * Application options
@@ -114,10 +116,12 @@ export class App {
 
             console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`);
 
-            const ip = this.world.integrationParameters;
+            // const ip = this.world.integrationParameters;
             // console.log(ip);
-            ip.contact_natural_frequency = 10;
-            ip.lengthUnit = 0.1;
+            // ip.contact_natural_frequency = 80;
+            // ip.lengthUnit = 0.1;
+            // ip.numInternalPgsIterations = 1;
+            // ip.numSolverIterations = 10;
 
             // Colliders Helper
             this.colliderHelper = new THREE.LineSegments(
