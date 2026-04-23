@@ -1,4 +1,3 @@
-export { Entity };
 /**
  * Class to create a 3D virtual world application
  */
@@ -246,4 +245,5 @@ export type AppOptions = {
 import { Entity } from './core/entity.js';
 import * as THREE from 'three';
 import { Outliner } from './ui/outliner.js';
+export { Entity, THREE, RAPIER };
 //# sourceMappingURL=virtualdev.d.ts.map

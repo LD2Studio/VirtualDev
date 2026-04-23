@@ -17,7 +17,7 @@ export class EntityManager {
      * @param {*} scale
      * @returns
      */
-    create(entity: any, position: any, rotation: any, scale: any): {
+    create(entity: any): {
         /**
          * - A name for the entity
          */
@@ -36,7 +36,20 @@ export class EntityManager {
         scale?: THREE.Vector3;
     };
     dispose(entity: any): void;
+    attach(entity1: any, entity2: any, jointParameters?: {}): {
+        impulseJoint: any;
+        /**
+         * Sets the motor velocity for the impulse joint
+         * @param {number} velocity - The motor velocity (radians per second)
+         * @param {number} [factor=0] - The factor to apply to the motor velocity (0 = infinite force)
+         */
+        setMotorVelocity(velocity: number, factor?: number): void;
+        _targetVelocity: number;
+        targetVelocity: number;
+        setMotorPosition(targetPos: any, stiffness?: number, damping?: number): void;
+    };
     update(): void;
+    createModel(model: any, initialPosition?: any): any;
 }
 /**
  * Class to create an entity
@@ -57,9 +70,9 @@ export class Entity {
     setPosition(position: any): this;
     setRotation(rotation: any): this;
     setMesh(mesh: any): this;
-    setGeometry(geometry: any): this;
+    setGeometry(geometry: any, offset?: any, rotation?: any): this;
     setMaterial(material: any): this;
-    setCollider(colliderDesc: any): this;
+    setCollider(colliderDesc: any, offset?: any, rotation?: any): this;
     setRigidBody(rigidBodyDesc: any): this;
     add(entity: any, position?: any, rotation?: any): any;
     clone(): Entity;
