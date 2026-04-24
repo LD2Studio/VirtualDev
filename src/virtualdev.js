@@ -27,7 +27,6 @@ export { Entity, THREE, RAPIER };
 
 let instance = null;    // Singleton instance
 let RENDER_ENGINE = null;   // Render Engine used
-let PHYSICS_ENGINE = null;  // Physics Engine used
 const physics = {
     timeAcc: 0,
     isRunning: true,
@@ -52,7 +51,6 @@ export class App {
         instance = this;
 
         RENDER_ENGINE = renderEngine;
-        PHYSICS_ENGINE = physicsEngine;
 
         const {
             name = 'Untitled',
@@ -108,13 +106,12 @@ export class App {
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.camera.position.z = 5;
 
-        this.world = null;
-        if (PHYSICS_ENGINE !== null) {
-            this.world = new PHYSICS_ENGINE.World({
+        if (physicsEngine !== null) {
+            this.world = new RAPIER.World({
                 x: 0, y: -9.81, z: 0
             });
 
-            console.log(`Physics Engine RAPIER v${PHYSICS_ENGINE.version()}`);
+            console.log(`Physics Engine RAPIER v${RAPIER.version()}`);
 
             // const ip = this.world.integrationParameters;
             // console.log(ip);
@@ -136,6 +133,9 @@ export class App {
                 this.colliderHelper.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
                 this.colliderHelper.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 4));
             }
+        }
+        else {
+            this.world = null;
         }
 
         /**
@@ -191,7 +191,7 @@ export class App {
         }
 
         // Instanciate Entity Manager
-        EntityManager.init( RENDER_ENGINE, PHYSICS_ENGINE, this.scene, this.world );
+        EntityManager.init( RENDER_ENGINE, physicsEngine, this.scene, this.world );
         this.sceneTree = EntityManager.getInstance();
 
         this._clock = new THREE.Clock();

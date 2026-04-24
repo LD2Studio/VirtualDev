@@ -8,3 +8,6 @@ roadmap/
 docs/.vitepress/dist
 docs/.vitepress/cache
 docs/deploy.sh
+# vscode
+.vscode/
+*.code-workspace
