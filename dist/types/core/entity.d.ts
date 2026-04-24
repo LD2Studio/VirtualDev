@@ -14,7 +14,6 @@ export class EntityManager {
      * @param {*} entity
      * @param {*} position
      * @param {*} rotation
-     * @param {*} scale
      * @returns
      */
     create(entity: any): {
@@ -73,6 +72,8 @@ export class Entity {
     setGeometry(geometry: any, offset?: any, rotation?: any): this;
     setMaterial(material: any): this;
     setCollider(colliderDesc: any, offset?: any, rotation?: any): this;
+    setColliders(collidersDesc: any): this;
+    collidersDesc: any;
     setRigidBody(rigidBodyDesc: any): this;
     add(entity: any, position?: any, rotation?: any): any;
     clone(): Entity;

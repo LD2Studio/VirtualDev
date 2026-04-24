@@ -6463,7 +6463,6 @@
      * @param {*} entity 
      * @param {*} position 
      * @param {*} rotation 
-     * @param {*} scale 
      * @returns 
      */
     create(entity) {
@@ -6472,7 +6471,7 @@
         console.warn("Geometry is not defined");
         mesh = new THREE.Object3D();
       } else {
-        if (entity.mesh instanceof THREE.Mesh) {
+        if (entity.mesh instanceof THREE.Mesh || entity.mesh instanceof THREE.Object3D || entity.mesh instanceof THREE.Group) {
           mesh = entity.mesh.clone();
         } else {
           mesh = new THREE.Mesh(
@@ -6480,6 +6479,8 @@
             entity.material
           );
         }
+        mesh.position.copy(entity.position);
+        mesh.rotation.copy(entity.rotation);
       }
       let rigidBody = null;
       if (entity.colliderDesc) {
@@ -6490,6 +6491,16 @@
         this.world.createCollider(entity.colliderDesc, rigidBody);
         rigidBody.setTranslation(entity.position);
         rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
+      } else if (entity.collidersDesc && entity.collidersDesc.length > 0) {
+        if (entity.rigidBodyDesc === null) {
+          entity.rigidBodyDesc = RAPIER.RigidBodyDesc.fixed();
+        }
+        rigidBody = this.world.createRigidBody(entity.rigidBodyDesc);
+        rigidBody.setTranslation(entity.position);
+        rigidBody.setRotation(new THREE.Quaternion().setFromEuler(entity.rotation));
+        entity.collidersDesc.forEach((colliderDesc) => {
+          this.world.createCollider(colliderDesc, rigidBody);
+        });
       }
       const addChild = (entityChild, meshParent, rigidBody2, parentMatrix) => {
         if (entityChild.geometry === null || entityChild.geometry instanceof THREE.BufferGeometry === false) {
@@ -6707,6 +6718,10 @@
       this.colliderDesc = colliderDesc.setTranslation(offset.x, offset.y, offset.z).setRotation(new THREE.Quaternion().setFromEuler(rotation));
       return this;
     }
+    setColliders(collidersDesc) {
+      this.collidersDesc = collidersDesc;
+      return this;
+    }
     setRigidBody(rigidBodyDesc) {
       this.rigidBodyDesc = rigidBodyDesc;
       return this;
@@ -6810,8 +6825,7 @@
       this.scene = new THREE__namespace.Scene();
       this.camera = new THREE__namespace.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
       this.camera.position.z = 5;
-      this.world = null;
-      if (PHYSICS_ENGINE !== null) {
+      if (physicsEngine !== null) {
         this.world = new PHYSICS_ENGINE.World({
           x: 0,
           y: -9.81,
@@ -6828,6 +6842,8 @@
           this.colliderHelper.geometry.setAttribute("position", new THREE__namespace.BufferAttribute(vertices, 3));
           this.colliderHelper.geometry.setAttribute("color", new THREE__namespace.BufferAttribute(colors, 4));
         };
+      } else {
+        this.world = null;
       }
       this.inputs = new Input();
       if (interactive) {
